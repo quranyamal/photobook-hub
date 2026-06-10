@@ -1,416 +1,208 @@
 # CLAUDE.md
 
-## Project Overview
+## Project
 
-This repository contains the source code for a commercial PhotoBook platform.
+PhotoBook Hub — a web platform for creating, ordering, and fulfilling personalized photobooks.
 
-The platform allows customers to:
+Business model:
+- Customers create photobooks
+- PhotoBook Hub receives orders
+- Production partners handle printing
+- Customers receive printed products
 
-* Upload photos
-* Create custom photobooks
-* Place orders online
-* Track production status
-* Receive notifications
-
-The business objective is to build a profitable photobook service.
-
-The engineering objective is to develop a production-grade platform demonstrating:
-
-* Modern software architecture
-* Cloud-native engineering
-* Platform engineering practices
-* OpenTelemetry observability
-* GitOps
-* CI/CD
-* SLO-driven operations
-* AI-assisted software development
-
-This project serves both as a commercial product and a Solution Architect portfolio.
+Current stage: **MVP** — validating that customers will purchase personalized photobooks online.
 
 ---
 
-# Guiding Principles
+## MVP Scope
 
-## Business First
+### Included
+- Customer registration and authentication
+- Photo uploads
+- Photobook creation
+- Order placement
+- Order management
 
-Prioritize customer value and business outcomes.
+### Excluded
+- Mobile applications
+- AI-generated layouts
+- Referral systems
+- Loyalty programs
+- Multi-country support
+- Complex workflow automation
 
-Prefer:
-
-* Simpler solutions
-* Faster delivery
-* Lower operational complexity
-
-Avoid introducing technologies solely for learning purposes.
-
-Every major technical decision should answer:
-
-> What business problem does this solve?
+Do not implement excluded features unless explicitly requested.
 
 ---
 
-## Incremental Complexity
+## Technology Stack
 
-Start simple.
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js, React, TypeScript, Tailwind CSS, shadcn/ui |
+| Backend | Next.js Route Handlers |
+| ORM | Prisma |
+| Database | PostgreSQL |
+| Validation | Zod |
+| Package manager | pnpm |
+| Infrastructure | Docker |
 
-Evolution path:
+Backend will be extracted to NestJS when operational complexity justifies it. See `AGENTS.md` for long-term stack vision.
 
-```text
-Monolith
-↓
-Modular Monolith
-↓
-Service Extraction
-↓
-Event-Driven Components
+---
+
+## Project Structure
+
+```
+src/
+├── app/           # Next.js App Router — pages and route handlers
+├── components/    # Shared UI components (shadcn/ui)
+├── features/      # Feature modules (colocated UI, logic, hooks)
+├── lib/           # Shared utilities and helpers
+├── server/        # Server-only logic (DB access, services)
+├── config/        # Environment configuration
+└── types/         # Shared TypeScript types
+docs/
+├── adr/           # Architecture Decision Records
+└── runbooks/      # Operational runbooks
+prisma/
+├── schema.prisma
+└── migrations/
 ```
 
-Do not introduce microservices before clear business or operational justification exists.
+---
+
+## Guiding Principles
+
+1. Business value over engineering elegance
+2. Simplicity over abstraction
+3. Prefer server-side execution
+4. Avoid premature optimization
+5. Keep dependencies minimal
+6. Increase complexity incrementally — only when justified by a real problem
+
+Every major technical decision must answer: *What business problem does this solve?*
 
 ---
 
-## AI-Assisted Development
+## Coding Standards
 
-Claude Code is a primary development tool.
+### TypeScript
+- Strict mode enabled
+- Avoid `any`
+- Prefer explicit types over inference for public APIs
 
-Expected responsibilities:
+### React
+- Default to Server Components
+- Use Client Components only for interactivity or browser APIs
 
-* Generate implementation plans
-* Generate code
-* Generate tests
-* Generate documentation
-* Generate architecture decision records
-* Generate runbooks
+### Validation
+- Use Zod for all external input
+- Validate at route handler boundaries
 
-Claude should not make architectural assumptions without documenting trade-offs.
+### Environment Variables
+- Access only through `src/config/env.ts`
+- Never read `process.env` directly outside that module
 
----
-
-# Technology Stack
-
-## Frontend
-
-* Next.js
-* TypeScript
-* Tailwind CSS
-* shadcn/ui
-
-## Backend
-
-* NestJS
-* TypeScript
-
-## Database
-
-* PostgreSQL
-
-## Cache
-
-* Redis
-
-## Storage
-
-* S3-compatible object storage
-
-Examples:
-
-* MinIO
-* AWS S3
+### General
+- Readability over cleverness
+- Explicit naming
+- Small, focused functions
+- No premature abstractions
 
 ---
 
-# Architecture Principles
+## Database Guidelines
 
-## Clean Architecture
+All schema changes must go through Prisma migrations.
 
-Separate:
+Workflow:
+1. Update `prisma/schema.prisma`
+2. `pnpm prisma migrate dev --name <description>`
+3. Commit both `schema.prisma` and migration files together
+4. `pnpm prisma generate`
 
-* Domain
-* Application
-* Infrastructure
-* Presentation
-
-Business logic must not depend on infrastructure frameworks.
-
----
-
-## Domain Driven Design
-
-Core domains:
-
-### Customer Domain
-
-* Registration
-* Authentication
-* Profile
-
-### Catalog Domain
-
-* Photobook templates
-* Pricing
-
-### Order Domain
-
-* Cart
-* Checkout
-* Orders
-
-### Production Domain
-
-* Production workflow
-* Status tracking
-
-### Notification Domain
-
-* Email
-* Messaging
+Never edit committed migration files.
+Never modify a production schema manually.
 
 ---
 
-## API Standards
+## Feature Development Workflow
 
-Use:
+Before implementing:
+1. Define user story and acceptance criteria
+2. Identify database schema impact
+3. Define API contract (inputs, outputs, errors)
 
-* REST APIs initially
-* OpenAPI documentation
-
-Requirements:
-
-* Versioned APIs
-* Consistent error responses
-* Structured validation
-
----
-
-# Observability Requirements
-
-All services must be observable.
-
-Minimum requirements:
-
-## Logging
-
-Structured JSON logs.
-
-Required fields:
-
-* timestamp
-* service
-* environment
-* requestId
-* traceId
-* userId (when available)
+Implementation order:
+1. Database schema
+2. Server logic / Route Handler
+3. Input validation (Zod)
+4. UI
+5. Tests
 
 ---
 
-## Metrics
+## Testing Standards
 
-Expose Prometheus-compatible metrics.
+Follow TDD (Test Driven Development):
+1. Write a failing test
+2. Write the minimum code to pass it
+3. Refactor
 
-Required metrics:
+Test types:
+- **Unit**: domain logic, business rules, utilities
+- **Integration**: route handlers, database interactions
+- **E2E**: registration, login, photo upload, checkout, order tracking
 
-* Request count
-* Error count
-* Request duration
-* Database latency
-
----
-
-## Tracing
-
-All services must support OpenTelemetry.
-
-Required trace propagation:
-
-* HTTP requests
-* Database calls
-* Queue processing
+Target 80%+ coverage for core business logic.
 
 ---
 
-# Testing Standards
-
-## Unit Tests
-
-Required for:
-
-* Domain services
-* Business rules
-* Critical workflows
-
-Target:
-
-* 80%+ coverage for core business logic
-
----
-
-## Integration Tests
-
-Required for:
-
-* APIs
-* Database interactions
-
----
-
-## End-to-End Tests
-
-Critical paths:
-
-* Registration
-* Login
-* Upload photos
-* Checkout
-* Order tracking
-
----
-
-# Security Requirements
+## Security
 
 Never:
+- Commit secrets, credentials, or tokens
+- Hardcode environment-specific values
 
-* Commit secrets
-* Commit credentials
-* Hardcode tokens
-
-Use:
-
-* Environment variables
-* Secret management
-
-Validate:
-
-* User input
-* Uploaded files
-* Authorization checks
+Always:
+- Source environment variables through `src/config/env.ts`
+- Validate all user input with Zod
+- Check authorization on every protected route handler
+- Validate uploaded files (type, size)
 
 ---
 
-# Infrastructure Roadmap
+## Definition of Done
 
-Phase 1:
-
-* Docker Compose
-* Single application deployment
-
-Phase 2:
-
-* Kubernetes
-* Helm
-
-Phase 3:
-
-* GitOps
-* ArgoCD
-
-Phase 4:
-
-* OpenTelemetry
-* Grafana LGTM
-
-Phase 5:
-
-* SLO Monitoring
-* Incident Response
+A task is complete when:
+- Code compiles without errors
+- `pnpm lint` passes
+- TypeScript type-check passes (`pnpm tsc --noEmit`)
+- Database migration runs cleanly
+- Acceptance criteria are satisfied
+- Documentation updated where required
+- Observability added (structured logging at minimum)
+- Security reviewed
 
 ---
 
-# CI/CD Standards
+## AI Instructions
 
-Every Pull Request must:
+When implementing features:
+- Read this file before starting
+- Review existing code before generating new code
+- Reuse existing patterns and utilities
+- Do not introduce unnecessary dependencies
+- Do not perform large refactors without explicit instruction
+- Do not implement MVP-excluded features unless explicitly asked
+- Do not make architectural assumptions without documenting trade-offs in `docs/adr/`
 
-* Pass linting
-* Pass tests
-* Build successfully
+For large changes:
+- Propose a plan first, then implement incrementally
+- Prefer small, reviewable pull-request-sized changes
 
-Deployment pipeline stages:
-
-```text
-Lint
-↓
-Test
-↓
-Build
-↓
-Security Scan
-↓
-Container Build
-↓
-Deploy
-```
-
----
-
-# Documentation Requirements
-
-All major changes require:
-
-## ADR
-
-Architecture Decision Record
-
-Document:
-
-* Context
-* Decision
-* Consequences
-* Alternatives
-
----
-
-## Runbooks
-
-Create operational runbooks for:
-
-* Deployment failures
-* Database issues
-* Service outages
-* High latency incidents
-
----
-
-# Coding Standards
-
-Prefer:
-
-* Readability over cleverness
-* Explicit naming
-* Small functions
-* Strong typing
-
-Avoid:
-
-* Premature optimization
-* Overengineering
-* Unnecessary abstractions
-
----
-
-# Definition of Done
-
-A feature is complete only when:
-
-* Code is implemented
-* Tests pass
-* Documentation updated
-* Observability added
-* Security reviewed
-
----
-
-# Long-Term Vision
-
-Build a production-grade platform that demonstrates the skills expected of:
-
-* Senior Platform Engineer
-* Solution Architect
-* Cloud Architect
-* Future CTO
-
-Every architectural decision should balance:
-
-* Customer value
-* Business sustainability
-* Engineering excellence
-* Operational simplicity
-
+Claude Code is a primary development tool. Responsibilities include:
+- Generating implementation plans, code, tests, documentation
+- Writing Architecture Decision Records
+- Writing operational runbooks
