@@ -21,7 +21,7 @@ Validate that customers are willing to purchase personalized photobooks online.
 * Download print-ready assets
 * Update order status
 
-### Production Partner
+### Production Team
 
 * Manual workflow outside system
 
@@ -39,11 +39,11 @@ Validate that customers are willing to purchase personalized photobooks online.
 * Referral system
 * Multi-language
 * Multi-country support
-* Production partner portal
+* Production team portal
 * Automated fulfillment
 
 ## Success Criteria
 
 * End-to-end order flow works
 * Customer can receive a printed photobook
-* At least one production partner can fulfill orders
+* In-house production team can fulfill orders

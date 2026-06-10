@@ -7,7 +7,7 @@ PhotoBook Hub — a web platform for creating, ordering, and fulfilling personal
 Business model:
 - Customers create photobooks
 - PhotoBook Hub receives orders
-- Production partners handle printing
+- In-house production team handles printing
 - Customers receive printed products
 
 Current stage: **MVP** — validating that customers will purchase personalized photobooks online.

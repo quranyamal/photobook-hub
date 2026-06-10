@@ -2,7 +2,7 @@
 
 ## Product Vision
 
-PhotoBook Hub is a marketplace-oriented platform connecting customers with production partners to deliver personalized, high-quality printed photobooks.
+PhotoBook Hub is a platform where customers create and order personalized photobooks, fulfilled by an in-house production team.
 
 ---
 
@@ -20,7 +20,7 @@ Success criteria:
 Increase conversion rate. Improve photobook editor UX. Expand template catalog.
 
 ### Phase 3 — Scale
-Production partner network. Geographic expansion. Volume pricing.
+Expand in-house production capacity. Geographic expansion. Volume pricing.
 
 ---
 
