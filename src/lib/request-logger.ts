@@ -1,7 +1,16 @@
+import { trace } from "@opentelemetry/api";
 import type { Logger } from "pino";
 import { logger } from "@/lib/logger";
 
 export type RequestLogger = Logger;
+
+function resolveTraceId(requestId: string): string {
+  const span = trace.getActiveSpan();
+  if (!span) return requestId;
+  const traceId = span.spanContext().traceId;
+  // All-zero traceId means no active trace (OTel SDK not yet active)
+  return traceId === "00000000000000000000000000000000" ? requestId : traceId;
+}
 
 export function createRequestLogger(
   requestId: string,
@@ -9,7 +18,7 @@ export function createRequestLogger(
 ): RequestLogger {
   return logger.child({
     requestId,
-    traceId: requestId, // placeholder until OpenTelemetry SDK is active (Phase 4)
+    traceId: resolveTraceId(requestId),
     ...context,
   });
 }

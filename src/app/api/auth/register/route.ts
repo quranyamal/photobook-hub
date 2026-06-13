@@ -3,6 +3,7 @@ import { hash } from "bcryptjs";
 import { z } from "zod";
 import { db } from "@/server/db";
 import { createRequestLogger, getRequestId } from "@/lib/request-logger";
+import { withSpan } from "@/lib/tracer";
 
 const registerSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -32,7 +33,10 @@ export async function POST(request: Request) {
 
   const { email, password, name } = parsed.data;
 
-  const existing = await db.user.findUnique({ where: { email } });
+  const existing = await withSpan("db.user.findUnique", () =>
+    db.user.findUnique({ where: { email } })
+  );
+
   if (existing) {
     log.warn({ email }, "Registration attempt with already registered email");
     return NextResponse.json(
@@ -43,10 +47,15 @@ export async function POST(request: Request) {
 
   const hashedPassword = await hash(password, 12);
 
-  const user = await db.user.create({
-    data: { email, hashedPassword, name },
-    select: { id: true, email: true, name: true, createdAt: true },
-  });
+  const user = await withSpan(
+    "db.user.create",
+    () =>
+      db.user.create({
+        data: { email, hashedPassword, name },
+        select: { id: true, email: true, name: true, createdAt: true },
+      }),
+    { "user.email": email }
+  );
 
   log.info({ userId: user.id }, "User registered successfully");
 
