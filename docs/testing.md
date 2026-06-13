@@ -1,5 +1,59 @@
 # Testing Guide
 
+## Test Inventory
+
+21 tests across 3 suites. Last updated: 2026-06-13.
+
+### `POST /api/auth/register` — `src/tests/api/auth/register.test.ts`
+
+**Success**
+- returns 201 with user data on valid registration
+- does not expose hashedPassword in the response
+- accepts registration without an optional name
+
+**Validation errors (400)**
+- returns 400 when email is missing
+- returns 400 when password is missing
+- returns 400 when email format is invalid
+- returns 400 when password is shorter than 8 characters
+- returns 400 when request body is empty
+
+**Conflict (409)**
+- returns 409 when email is already registered
+
+---
+
+### `GET /api/docs` — `src/tests/api/docs.test.ts`
+
+- returns 200
+- returns Content-Type text/html
+- renders Swagger UI bundle
+- embeds the PhotoBook Hub OpenAPI spec
+
+---
+
+### `GET|POST /api/auth/[...nextauth]` — `src/tests/api/auth/nextauth.test.ts`
+
+**GET /api/auth/session**
+- delegates to the Auth.js GET handler
+- returns 200 with empty session when unauthenticated
+
+**GET /api/auth/providers**
+- delegates to the Auth.js GET handler
+- returns 200 with credentials provider in the list
+
+**GET /api/auth/csrf**
+- delegates to the Auth.js GET handler
+- returns 200 with a csrfToken field
+
+**POST /api/auth/signin**
+- delegates to the Auth.js POST handler
+
+**POST /api/auth/signout**
+- delegates to the Auth.js POST handler
+
+---
+
 ## Philosophy
 
 This project follows **Test Driven Development (TDD)**:
