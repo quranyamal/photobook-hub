@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { hash } from "bcryptjs";
 import { z } from "zod";
 import { db } from "@/server/db";
+import { createRequestLogger, getRequestId } from "@/lib/request-logger";
 
 const registerSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -10,10 +11,19 @@ const registerSchema = z.object({
 });
 
 export async function POST(request: Request) {
-  const body = await request.json();
+  const requestId = getRequestId(request);
+  const log = createRequestLogger(requestId, {
+    method: "POST",
+    path: "/api/auth/register",
+  });
 
+  log.info("Incoming request");
+
+  const body = await request.json();
   const parsed = registerSchema.safeParse(body);
+
   if (!parsed.success) {
+    log.warn({ details: parsed.error.flatten().fieldErrors }, "Validation failed");
     return NextResponse.json(
       { error: "Validation failed", details: parsed.error.flatten().fieldErrors },
       { status: 400 }
@@ -24,6 +34,7 @@ export async function POST(request: Request) {
 
   const existing = await db.user.findUnique({ where: { email } });
   if (existing) {
+    log.warn({ email }, "Registration attempt with already registered email");
     return NextResponse.json(
       { error: "Email already registered" },
       { status: 409 }
@@ -36,6 +47,8 @@ export async function POST(request: Request) {
     data: { email, hashedPassword, name },
     select: { id: true, email: true, name: true, createdAt: true },
   });
+
+  log.info({ userId: user.id }, "User registered successfully");
 
   return NextResponse.json(user, { status: 201 });
 }

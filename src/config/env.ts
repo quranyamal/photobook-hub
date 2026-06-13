@@ -6,6 +6,9 @@ const schema = z.object({
     .enum(["development", "test", "production"])
     .default("development"),
   AUTH_SECRET: z.string().min(1, "AUTH_SECRET is required"),
+  LOG_LEVEL: z
+    .enum(["fatal", "error", "warn", "info", "debug", "trace"])
+    .default("info"),
 });
 
 const parsed = schema.safeParse(process.env);

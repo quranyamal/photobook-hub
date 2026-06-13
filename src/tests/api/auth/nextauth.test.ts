@@ -9,6 +9,7 @@ jest.mock("@/lib/auth", () => ({
   auth: jest.fn(),
 }));
 
+import { NextRequest } from "next/server";
 import { GET, POST } from "@/app/api/auth/[...nextauth]/route";
 import { handlers } from "@/lib/auth";
 
@@ -16,11 +17,7 @@ const mockGet = handlers.GET as jest.Mock;
 const mockPost = handlers.POST as jest.Mock;
 
 const makeRequest = (path: string, method = "GET") =>
-  new Request(`http://localhost/api/auth/${path}`, { method });
-
-const makeCtx = (segments: string[]) => ({
-  params: Promise.resolve({ nextauth: segments }),
-});
+  new NextRequest(`http://localhost/api/auth/${path}`, { method });
 
 beforeEach(() => jest.clearAllMocks());
 
@@ -30,16 +27,15 @@ describe("GET /api/auth/[...nextauth]", () => {
       mockGet.mockResolvedValue(new Response(JSON.stringify({}), { status: 200 }));
 
       const req = makeRequest("session");
-      const ctx = makeCtx(["session"]);
-      await GET(req, ctx);
+      await GET(req);
 
-      expect(mockGet).toHaveBeenCalledWith(req, ctx);
+      expect(mockGet).toHaveBeenCalledWith(req);
     });
 
     it("returns 200 with empty session when unauthenticated", async () => {
       mockGet.mockResolvedValue(new Response(JSON.stringify({}), { status: 200 }));
 
-      const res = await GET(makeRequest("session"), makeCtx(["session"]));
+      const res = await GET(makeRequest("session"));
 
       expect(res.status).toBe(200);
       expect(await res.json()).toEqual({});
@@ -54,10 +50,9 @@ describe("GET /api/auth/[...nextauth]", () => {
       mockGet.mockResolvedValue(new Response(JSON.stringify(providers), { status: 200 }));
 
       const req = makeRequest("providers");
-      const ctx = makeCtx(["providers"]);
-      await GET(req, ctx);
+      await GET(req);
 
-      expect(mockGet).toHaveBeenCalledWith(req, ctx);
+      expect(mockGet).toHaveBeenCalledWith(req);
     });
 
     it("returns 200 with credentials provider in the list", async () => {
@@ -66,7 +61,7 @@ describe("GET /api/auth/[...nextauth]", () => {
       };
       mockGet.mockResolvedValue(new Response(JSON.stringify(providers), { status: 200 }));
 
-      const res = await GET(makeRequest("providers"), makeCtx(["providers"]));
+      const res = await GET(makeRequest("providers"));
 
       expect(res.status).toBe(200);
       const body = await res.json();
@@ -81,10 +76,9 @@ describe("GET /api/auth/[...nextauth]", () => {
       );
 
       const req = makeRequest("csrf");
-      const ctx = makeCtx(["csrf"]);
-      await GET(req, ctx);
+      await GET(req);
 
-      expect(mockGet).toHaveBeenCalledWith(req, ctx);
+      expect(mockGet).toHaveBeenCalledWith(req);
     });
 
     it("returns 200 with a csrfToken field", async () => {
@@ -92,7 +86,7 @@ describe("GET /api/auth/[...nextauth]", () => {
         new Response(JSON.stringify({ csrfToken: "token_abc" }), { status: 200 })
       );
 
-      const res = await GET(makeRequest("csrf"), makeCtx(["csrf"]));
+      const res = await GET(makeRequest("csrf"));
 
       expect(res.status).toBe(200);
       const body = await res.json();
@@ -108,10 +102,9 @@ describe("POST /api/auth/[...nextauth]", () => {
       mockPost.mockResolvedValue(new Response(null, { status: 200 }));
 
       const req = makeRequest("signin", "POST");
-      const ctx = makeCtx(["signin"]);
-      await POST(req, ctx);
+      await POST(req);
 
-      expect(mockPost).toHaveBeenCalledWith(req, ctx);
+      expect(mockPost).toHaveBeenCalledWith(req);
     });
   });
 
@@ -120,10 +113,9 @@ describe("POST /api/auth/[...nextauth]", () => {
       mockPost.mockResolvedValue(new Response(null, { status: 200 }));
 
       const req = makeRequest("signout", "POST");
-      const ctx = makeCtx(["signout"]);
-      await POST(req, ctx);
+      await POST(req);
 
-      expect(mockPost).toHaveBeenCalledWith(req, ctx);
+      expect(mockPost).toHaveBeenCalledWith(req);
     });
   });
 });
