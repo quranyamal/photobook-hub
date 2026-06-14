@@ -1,6 +1,13 @@
 import { openApiSpec } from "@/lib/openapi";
+import { createRequestLogger, getRequestId, logResponse } from "@/lib/request-logger";
 
-export async function GET() {
+export async function GET(request: Request) {
+  const requestId = getRequestId(request);
+  const log = createRequestLogger(requestId, { method: "GET", path: "/api/docs" });
+  const start = Date.now();
+
+  log.debug("Incoming request");
+
   const html = `<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -29,7 +36,10 @@ export async function GET() {
   </body>
 </html>`;
 
-  return new Response(html, {
+  const response = new Response(html, {
     headers: { "Content-Type": "text/html; charset=utf-8" },
   });
+
+  logResponse(log, 200, start);
+  return response;
 }

@@ -19,7 +19,7 @@ export const logger = pino({
       target: "pino-pretty",
       options: {
         colorize: true,
-        ignore: "pid,hostname,service,environment",
+        ignore: "pid,hostname",
         translateTime: "HH:MM:ss.l",
       },
     },
