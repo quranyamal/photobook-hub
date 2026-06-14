@@ -154,6 +154,7 @@ Write ADR-0007: Storage strategy (local → MinIO → S3).
 New route handlers (all behind auth middleware):
 - `POST /api/projects` — create project
 - `GET /api/projects` — list user's projects
+- `GET /api/projects/[id]` — get single project detail
 - `POST /api/projects/[id]/photos` — upload photo (multipart/form-data)
 - `GET /api/projects/[id]/photos` — list photos in project
 - `DELETE /api/projects/[id]/photos/[photoId]` — delete photo
@@ -305,6 +306,8 @@ enum PaymentStatus { AWAITING CONFIRMED FAILED }
 
 Hardcode base prices per size in a config file (no dynamic pricing for MVP).
 
+Shipping address stored as scalar fields directly on `Order` (no separate `Address` model for MVP). Fields: `recipientName`, `phoneNumber`, `addressLine`, `city`, `province`, `postalCode`.
+
 ### Session 2 — Checkout API
 
 - `POST /api/orders` — create order from photobook
@@ -440,6 +443,7 @@ Hardcode base prices per size in a config file (no dynamic pricing for MVP).
 | `POST /api/auth/signin` | ✅ Done (Auth.js) |
 | `POST /api/projects` | 3 |
 | `GET /api/projects` | 3 |
+| `GET /api/projects/[id]` | 3 |
 | `POST /api/projects/[id]/photos` | 3 |
 | `GET /api/projects/[id]/photos` | 3 |
 | `DELETE /api/projects/[id]/photos/[photoId]` | 3 |
