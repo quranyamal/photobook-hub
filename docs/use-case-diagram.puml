@@ -1,0 +1,143 @@
+@startuml PhotoBook Hub — Use Case Diagram
+
+title PhotoBook Hub — Use Case Diagram (MVP)
+
+left to right direction
+
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+skinparam linetype ortho
+
+skinparam usecase {
+    BackgroundColor #FFFDE7
+    BorderColor     #F9A825
+    FontSize        12
+}
+
+skinparam actor {
+    BackgroundColor #E3F2FD
+    BorderColor     #1565C0
+    FontSize        12
+}
+
+skinparam package {
+    BackgroundColor #FAFAFA
+    BorderColor     #BDBDBD
+    FontSize        11
+    FontStyle       bold
+}
+
+' ── Actors ──────────────────────────────────────────────────────────────────
+
+actor "Guest"            as Guest
+actor "Customer"         as Customer
+actor "Admin"            as Admin
+actor "Production Team"  as ProdTeam
+
+' ── System Boundary ─────────────────────────────────────────────────────────
+
+rectangle "PhotoBook Hub" {
+
+    ' ── Authentication ──────────────────────────────────────────────────────
+    package "Authentication" {
+        usecase "Register"                    as UC01
+        usecase "Login"                       as UC02
+        usecase "Logout"                      as UC03
+    }
+
+    ' ── Project & Photo Management ──────────────────────────────────────────
+    package "Project & Photos" {
+        usecase "Create Project"              as UC04
+        usecase "Upload Photos"               as UC05
+        usecase "View Photos"                 as UC06
+        usecase "Delete Photo"                as UC07
+    }
+
+    ' ── Photobook Editor ────────────────────────────────────────────────────
+    package "Photobook Editor" {
+        usecase "Create Photobook"            as UC08
+        usecase "Select Size & Cover Type"    as UC09
+        usecase "Auto-assign Photos to Pages" as UC10
+        usecase "Preview Photobook"           as UC11
+    }
+
+    ' ── Order Placement (Customer) ──────────────────────────────────────────
+    package "Order Placement" {
+        usecase "Place Order"                 as UC12
+        usecase "Enter Shipping Address"      as UC13
+        usecase "Confirm Order Summary"       as UC14
+        usecase "Submit Payment Reference"    as UC15
+        usecase "View My Orders"              as UC16
+        usecase "Track Order Status"          as UC17
+    }
+
+    ' ── Admin Panel ─────────────────────────────────────────────────────────
+    package "Admin Panel" {
+        usecase "View All Orders"             as UC18
+        usecase "View Order Detail"           as UC19
+        usecase "Confirm Payment"             as UC20
+        usecase "Reject Payment"              as UC21
+        usecase "Download Print Assets"       as UC22
+        usecase "Update Order Status"         as UC23
+    }
+}
+
+' ── Guest Associations ──────────────────────────────────────────────────────
+
+Guest  --> UC01
+Guest  --> UC02
+
+' ── Customer Associations ───────────────────────────────────────────────────
+
+Customer --> UC02
+Customer --> UC03
+Customer --> UC04
+Customer --> UC05
+Customer --> UC06
+Customer --> UC07
+Customer --> UC08
+Customer --> UC12
+Customer --> UC15
+Customer --> UC16
+Customer --> UC17
+
+' ── Admin Associations ──────────────────────────────────────────────────────
+
+Admin --> UC02
+Admin --> UC03
+Admin --> UC18
+Admin --> UC20
+Admin --> UC21
+Admin --> UC22
+Admin --> UC23
+
+' ── Production Team ─────────────────────────────────────────────────────────
+' Receives files manually — outside the system boundary
+
+ProdTeam ..> UC22 : <<receives manually>>
+
+' ── «include» Relationships ─────────────────────────────────────────────────
+' The base use case always triggers the included use case.
+
+UC04 .> UC05 : <<include>>
+UC05 .> UC06 : <<include>>
+
+UC08 .> UC09 : <<include>>
+UC08 .> UC10 : <<include>>
+UC08 .> UC11 : <<include>>
+
+UC12 .> UC13 : <<include>>
+UC12 .> UC14 : <<include>>
+
+UC18 .> UC19 : <<include>>
+UC20 .> UC19 : <<include>>
+UC21 .> UC19 : <<include>>
+UC22 .> UC19 : <<include>>
+UC23 .> UC19 : <<include>>
+
+' ── «extend» Relationships ──────────────────────────────────────────────────
+' The extending use case adds optional behaviour to the base use case.
+
+UC15 .> UC17 : <<extend>>
+
+@enduml
