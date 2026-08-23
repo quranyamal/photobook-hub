@@ -45,14 +45,16 @@ export default async function DashboardPage() {
             </CardHeader>
           </Card>
         </Link>
-        <Card>
-          <CardHeader>
-            <CardTitle>Orders</CardTitle>
-            <CardDescription>
-              Your order history will appear here.
-            </CardDescription>
-          </CardHeader>
-        </Card>
+        <Link href="/orders">
+          <Card className="hover:ring-primary/30 transition-all cursor-pointer">
+            <CardHeader>
+              <CardTitle>Orders</CardTitle>
+              <CardDescription>
+                View and track your photobook orders.
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
       </div>
     </div>
   );

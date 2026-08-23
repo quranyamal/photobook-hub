@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 
 const { auth } = NextAuth(authConfig);
 
-const APP_ROUTE = /^\/(dashboard|projects|orders)(\/|$)/;
+const APP_ROUTE = /^\/(dashboard|projects|orders|checkout)(\/|$)/;
 
 export default auth((req) => {
   const requestId = crypto.randomUUID();

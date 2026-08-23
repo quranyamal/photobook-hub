@@ -33,8 +33,10 @@ Deliver the minimum viable PhotoBook Hub platform: a customer can register, uplo
 | Photo upload API (6 endpoints + file serving) | ✅ Done |
 | Photo upload UI (projects list + project detail) | ✅ Done |
 | Photobook editor (schema, API, UI) | ✅ Done |
+| Order placement (schema, API, UI) | ✅ Done |
+| Test suite | ✅ 113 tests passing |
 
-**Not yet implemented:** Orders, admin panel, payments.
+**Not yet implemented:** Admin panel, Sprint 7 polish.
 
 ---
 
@@ -283,43 +285,34 @@ enum PaymentMethod { BANK_TRANSFER }
 enum PaymentStatus { AWAITING CONFIRMED FAILED }
 ```
 
-Hardcode base prices per size in a config file (no dynamic pricing for MVP).
+Pricing and flat-rate shipping ($9.99) in `src/config/pricing.ts`.
+Shipping address as scalar fields on `Order`. Migration: `add-orders`.
 
-Shipping address stored as scalar fields directly on `Order` (no separate `Address` model for MVP). Fields: `recipientName`, `phoneNumber`, `addressLine`, `city`, `province`, `postalCode`.
+### Session 2 — Checkout API ✅ Completed
 
-### Session 2 — Checkout API
-
-- `POST /api/orders` — create order from photobook
+- `POST /api/orders` — create order from photobook with pricing + address
 - `GET /api/orders` — list user's orders
-- `GET /api/orders/[id]` — order detail with status
-- `POST /api/orders/[id]/payment` — submit payment reference code
+- `GET /api/orders/[id]` — order detail with payment status
+- `POST /api/orders/[id]/payment` — submit bank transfer reference code
+- 16 new tests (113 total passing)
 
-### Session 3 — Checkout UI
+### Session 3 — Checkout UI ✅ Completed
 
-**Checkout** `src/app/(app)/checkout/[photobookId]/page.tsx`
-- Order summary: photobook size, cover type, page count, price
-- Shipping address form (name, address, city, province, postal code)
-- Order total breakdown (subtotal + shipping)
-- "Place Order" button
-
-**Order confirmation** `src/app/(app)/orders/[id]/page.tsx`
-- Order number
-- Bank transfer instructions with account details
-- "I have transferred" button → `POST /api/orders/[id]/payment` with reference code
-- Order status tracker
-
-**Orders list** `src/app/(app)/orders/page.tsx`
-- Table of all user orders with status badge
+- `src/app/(app)/checkout/[photobookId]/page.tsx` — server component fetching photobook, renders `CheckoutForm` (address fields + order summary + total breakdown)
+- `src/app/(app)/orders/[id]/page.tsx` — order confirmation with bank transfer instructions, reference code submission, 5-step status tracker
+- `src/app/(app)/orders/page.tsx` — orders table with status badges
+- Middleware updated: `checkout` added to protected route regex
+- Dashboard Orders card now links to `/orders`
 
 ### Definition of Done
 
-- [ ] Customer can proceed from editor to checkout
-- [ ] Order is created with correct pricing
-- [ ] Customer sees bank transfer instructions
-- [ ] Customer can submit payment reference code
-- [ ] Order status updates to `PENDING_PAYMENT` then `PAID`
-- [ ] All route handlers have tests
-- [ ] `pnpm test`, `pnpm lint`, `pnpm tsc --noEmit` pass
+- [x] Customer can proceed from editor to checkout
+- [x] Order is created with correct pricing
+- [x] Customer sees bank transfer instructions
+- [x] Customer can submit payment reference code
+- [x] Order status updates to `PENDING_PAYMENT` then `PAID`
+- [x] All route handlers have tests
+- [x] `pnpm test`, `pnpm lint`, `pnpm tsc --noEmit` pass
 
 ---
 
