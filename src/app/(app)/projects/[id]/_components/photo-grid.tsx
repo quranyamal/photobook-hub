@@ -45,9 +45,9 @@ export function PhotoGrid({
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
       {photos.map((photo) => (
-        // Outer div: relative anchor for the button — no overflow-hidden here
+        // Outer div: relative anchor for button — no overflow-hidden here
         <div key={photo.id} className="relative aspect-square rounded-lg bg-muted">
-          {/* Inner div: overflow-hidden clips the image only, not the button */}
+          {/* Inner div: overflow-hidden clips the image and gradient only */}
           <div className="absolute inset-0 overflow-hidden rounded-lg">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -55,11 +55,15 @@ export function PhotoGrid({
               alt={photo.fileName}
               className="w-full h-full object-cover"
             />
+            <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 to-transparent px-2 py-1.5">
+              <p className="text-white text-xs truncate">{photo.fileName}</p>
+            </div>
           </div>
+          {/* Button is a sibling of the image div — never clipped by overflow-hidden */}
           <Button
             variant="destructive"
             size="icon-xs"
-            className="absolute top-1.5 right-1.5"
+            className="absolute top-1.5 right-1.5 bg-white/90 text-destructive hover:bg-white shadow-sm"
             onClick={() => handleDelete(photo.id)}
             disabled={deleting === photo.id}
             aria-label={`Delete ${photo.fileName}`}
