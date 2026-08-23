@@ -55,13 +55,13 @@ export function PhotoGrid({
             alt={photo.fileName}
             className="w-full h-full object-cover"
           />
-          <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent p-2">
+          <div className="absolute bottom-0 inset-x-0 z-10 bg-gradient-to-t from-black/60 to-transparent p-2">
             <p className="text-white text-xs truncate">{photo.fileName}</p>
           </div>
           <Button
             variant="destructive"
             size="icon-xs"
-            className="absolute top-1.5 right-1.5"
+            className="absolute top-1.5 right-1.5 z-20"
             onClick={() => handleDelete(photo.id)}
             disabled={deleting === photo.id}
             aria-label={`Delete ${photo.fileName}`}
