@@ -47,7 +47,7 @@ export function PhotoGrid({
       {photos.map((photo) => (
         <div
           key={photo.id}
-          className="group relative aspect-square overflow-hidden rounded-lg bg-muted"
+          className="relative aspect-square overflow-hidden rounded-lg bg-muted"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -55,20 +55,19 @@ export function PhotoGrid({
             alt={photo.fileName}
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 flex items-end justify-between bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-2">
-            <p className="text-white text-xs truncate flex-1 mr-1">
-              {photo.fileName}
-            </p>
-            <Button
-              variant="destructive"
-              size="icon-sm"
-              onClick={() => handleDelete(photo.id)}
-              disabled={deleting === photo.id}
-              aria-label={`Delete ${photo.fileName}`}
-            >
-              <Trash2 />
-            </Button>
+          <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent p-2">
+            <p className="text-white text-xs truncate">{photo.fileName}</p>
           </div>
+          <Button
+            variant="destructive"
+            size="icon-xs"
+            className="absolute top-1.5 right-1.5"
+            onClick={() => handleDelete(photo.id)}
+            disabled={deleting === photo.id}
+            aria-label={`Delete ${photo.fileName}`}
+          >
+            <Trash2 />
+          </Button>
         </div>
       ))}
     </div>
