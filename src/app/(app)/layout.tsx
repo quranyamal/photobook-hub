@@ -1,8 +1,13 @@
-export default function AppLayout({
+import { auth, signOut } from "@/lib/auth";
+import { Button } from "@/components/ui/button";
+
+export default async function AppLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await auth();
+
   return (
     <div className="min-h-screen flex flex-col">
       <header className="border-b bg-background">
@@ -11,7 +16,23 @@ export default function AppLayout({
             <span className="text-lg font-semibold tracking-tight">
               PhotoBook Hub
             </span>
-            {/* Nav actions added in Session 3 */}
+            {session?.user && (
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-muted-foreground">
+                  {session.user.name ?? session.user.email}
+                </span>
+                <form
+                  action={async () => {
+                    "use server";
+                    await signOut({ redirectTo: "/login" });
+                  }}
+                >
+                  <Button type="submit" variant="outline" size="sm">
+                    Log out
+                  </Button>
+                </form>
+              </div>
+            )}
           </div>
         </div>
       </header>
