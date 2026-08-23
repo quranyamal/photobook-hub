@@ -3,6 +3,7 @@ import { db } from "@/server/db";
 import { storage } from "@/server/storage";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { PhotoUploadZone } from "./_components/photo-upload-zone";
 import { PhotoGrid } from "./_components/photo-grid";
 
@@ -68,6 +69,18 @@ export default async function ProjectPage({
         <h2 className="text-base font-semibold">Photos</h2>
         <PhotoGrid projectId={project.id} photos={photos} />
       </section>
+
+      {photos.length > 0 && (
+        <section className="space-y-3">
+          <h2 className="text-base font-semibold">Photobook</h2>
+          <p className="text-sm text-muted-foreground">
+            Ready to turn your photos into a photobook?
+          </p>
+          <Link href={`/projects/${project.id}/editor`}>
+            <Button>Create photobook</Button>
+          </Link>
+        </section>
+      )}
     </div>
   );
 }

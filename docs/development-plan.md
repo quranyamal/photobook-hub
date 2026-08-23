@@ -32,8 +32,9 @@ Deliver the minimum viable PhotoBook Hub platform: a customer can register, uplo
 | `StorageProvider` interface + `LocalStorage` impl | ✅ Done |
 | Photo upload API (6 endpoints + file serving) | ✅ Done |
 | Photo upload UI (projects list + project detail) | ✅ Done |
+| Photobook editor (schema, API, UI) | ✅ Done |
 
-**Not yet implemented:** Photobook editor, orders, admin panel, payments.
+**Not yet implemented:** Orders, admin panel, payments.
 
 ---
 
@@ -198,34 +199,35 @@ enum PhotobookSize { A4 A5 SQUARE }
 enum CoverType    { SOFTCOVER HARDCOVER }
 ```
 
-Seed basic product options (A4, A5, Square; soft/hard cover) into a `ProductVariant` lookup table.
+Pricing hardcoded in `src/config/pricing.ts` (no ProductVariant table for MVP).
 
-### Session 2 — Editor API
+### Session 2 — Editor API ✅ Completed
 
-- `POST /api/projects/[id]/photobook` — create photobook from project
-- `GET /api/projects/[id]/photobook` — get photobook with pages
+- `POST /api/projects/[id]/photobook` — create photobook; auto-assigns photos to pages sequentially; 409 if already exists
+- `GET /api/projects/[id]/photobook` — get photobook with pages and photo URLs
 - `PUT /api/projects/[id]/photobook` — update size / cover type
-- `PUT /api/projects/[id]/photobook/pages/[num]` — update page layout
+- `PUT /api/projects/[id]/photobook/pages/[num]` — update a single page's photoId
+- 17 new tests (97 total passing)
 
-### Session 3 — Basic Editor UI
+### Session 3 — Basic Editor UI ✅ Completed
 
 **Editor** `src/app/(app)/projects/[id]/editor/page.tsx`
-- Step 1: Select size (A4 / A5 / Square) and cover type
-- Step 2: Auto-assign photos to pages (one photo per page, sequential)
-- Step 3: Preview — scrollable view of all pages with photo thumbnails
-- "Save" button persists layout
-- "Proceed to Order" button — links to checkout (Sprint 5)
-
-No drag-and-drop reordering for MVP. Sequential auto-layout only.
+- Size selector (A4 / A5 / Square) and cover type selector (Softcover / Hardcover)
+- Live price display from `src/config/pricing.ts`
+- "Create photobook" button — auto-assigns photos server-side on POST
+- Page preview grid — aspect-ratio-correct cards with photo thumbnails
+- "Save options" updates size/cover on existing photobook
+- "Proceed to order" links to `/checkout/[photobookId]` (Sprint 5)
+- Project detail page gains "Create photobook" button when photos exist
 
 ### Definition of Done
 
-- [ ] Customer can create a photobook from a project
-- [ ] Customer can select size and cover type
-- [ ] Photos are auto-assigned to pages
-- [ ] Customer can preview all pages
-- [ ] Layout is persisted
-- [ ] `pnpm test`, `pnpm lint`, `pnpm tsc --noEmit` pass
+- [x] Customer can create a photobook from a project
+- [x] Customer can select size and cover type
+- [x] Photos are auto-assigned to pages
+- [x] Customer can preview all pages
+- [x] Layout is persisted
+- [x] `pnpm test`, `pnpm lint`, `pnpm tsc --noEmit` pass
 
 ---
 
