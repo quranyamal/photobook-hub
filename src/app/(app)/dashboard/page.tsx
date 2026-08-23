@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/server/db";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import {
   Card,
   CardDescription,
@@ -34,14 +35,16 @@ export default async function DashboardPage() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Projects</CardTitle>
-            <CardDescription>
-              Your photobook projects will appear here.
-            </CardDescription>
-          </CardHeader>
-        </Card>
+        <Link href="/projects">
+          <Card className="hover:ring-primary/30 transition-all cursor-pointer">
+            <CardHeader>
+              <CardTitle>Projects</CardTitle>
+              <CardDescription>
+                Create and manage your photobook projects.
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
         <Card>
           <CardHeader>
             <CardTitle>Orders</CardTitle>

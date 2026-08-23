@@ -31,8 +31,9 @@ Deliver the minimum viable PhotoBook Hub platform: a customer can register, uplo
 | Project + Photo Prisma models + migration | ✅ Applied |
 | `StorageProvider` interface + `LocalStorage` impl | ✅ Done |
 | Photo upload API (6 endpoints + file serving) | ✅ Done |
+| Photo upload UI (projects list + project detail) | ✅ Done |
 
-**Not yet implemented:** Photo upload UI, photobook editor, orders, admin panel, payments.
+**Not yet implemented:** Photobook editor, orders, admin panel, payments.
 
 ---
 
@@ -40,7 +41,7 @@ Deliver the minimum viable PhotoBook Hub platform: a customer can register, uplo
 
 ```
 Auth UI          → Sprint 2  ✅ Done
-Photo Upload     → Sprint 3  🔄 In progress (Session 1 done)
+Photo Upload     → Sprint 3  ✅ Done
 Photobook Editor → Sprint 4
 Order Placement  → Sprint 5
 Admin Panel      → Sprint 6
@@ -137,27 +138,28 @@ Route handlers implemented (all session-guarded, 401 on unauthenticated):
 
 Validation: JPEG/PNG only, max 20 MB. Swagger spec updated with Projects + Photos tags.
 
-### Session 3 — Photo Upload UI
+### Session 3 — Photo Upload UI ✅ Completed
 
 **Projects page** `src/app/(app)/projects/page.tsx`
-- List user's projects with status badge
-- "New Project" button → modal with title input
+- Lists projects with DRAFT/IN_PROGRESS/READY status badge and photo count
+- Empty state with dashed border + "New project" prompt
+- "New project" modal (title input, create → redirect to project)
 
 **Project detail** `src/app/(app)/projects/[id]/page.tsx`
-- Photo grid (uploaded photos as thumbnails)
-- Drag-and-drop upload zone (multiple files)
-- Upload progress indicator per file
-- Delete photo button
+- Drag-and-drop upload zone with per-file XHR progress bar
+- Photo thumbnail grid (2–4 columns responsive)
+- Hover overlay with filename + delete button; delete calls API then `router.refresh()`
+- Dashboard Projects card now links to `/projects`
 
 ### Definition of Done
 
-- [ ] Customer can create a project
-- [ ] Customer can upload JPEG/PNG photos (max 20 MB each)
-- [ ] Photos display as thumbnails in the project
-- [ ] Customer can delete a photo
-- [ ] File type and size validation enforced on API
-- [ ] All route handlers have tests
-- [ ] `pnpm test`, `pnpm lint`, `pnpm tsc --noEmit` pass
+- [x] Customer can create a project
+- [x] Customer can upload JPEG/PNG photos (max 20 MB each)
+- [x] Photos display as thumbnails in the project
+- [x] Customer can delete a photo
+- [x] File type and size validation enforced on API
+- [x] All route handlers have tests
+- [x] `pnpm test`, `pnpm lint`, `pnpm tsc --noEmit` pass
 
 ---
 
