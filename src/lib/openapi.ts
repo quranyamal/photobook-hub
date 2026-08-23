@@ -19,6 +19,7 @@ export const openApiSpec = {
     { name: "Auth", description: "Authentication and registration" },
     { name: "Projects", description: "Photobook project management" },
     { name: "Photos", description: "Photo uploads within a project" },
+    { name: "Photobook", description: "Photobook creation and editor" },
   ],
   paths: {
     "/auth/register": {
@@ -216,6 +217,86 @@ export const openApiSpec = {
         },
       },
     },
+    "/projects/{id}/photobook": {
+      post: {
+        tags: ["Photobook"],
+        summary: "Create photobook from project photos",
+        description: "Auto-assigns photos to pages sequentially. Returns 409 if a photobook already exists.",
+        operationId: "createPhotobook",
+        security: [{ cookieAuth: [] }],
+        parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
+        responses: {
+          "201": { description: "Photobook created", content: { "application/json": { schema: { $ref: "#/components/schemas/Photobook" } } } },
+          "401": { description: "Unauthorized", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
+          "404": { description: "Project not found", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
+          "409": { description: "Photobook already exists", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
+        },
+      },
+      get: {
+        tags: ["Photobook"],
+        summary: "Get photobook with pages",
+        operationId: "getPhotobook",
+        security: [{ cookieAuth: [] }],
+        parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
+        responses: {
+          "200": { description: "Photobook detail", content: { "application/json": { schema: { $ref: "#/components/schemas/PhotobookDetail" } } } },
+          "401": { description: "Unauthorized", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
+          "404": { description: "Photobook not found", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
+        },
+      },
+      put: {
+        tags: ["Photobook"],
+        summary: "Update size or cover type",
+        operationId: "updatePhotobook",
+        security: [{ cookieAuth: [] }],
+        parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/UpdatePhotobookRequest" },
+              example: { size: "A5", coverType: "HARDCOVER" },
+            },
+          },
+        },
+        responses: {
+          "200": { description: "Photobook updated", content: { "application/json": { schema: { $ref: "#/components/schemas/Photobook" } } } },
+          "400": { description: "Validation failed", content: { "application/json": { schema: { $ref: "#/components/schemas/ValidationError" } } } },
+          "401": { description: "Unauthorized", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
+          "404": { description: "Project not found", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
+        },
+      },
+    },
+    "/projects/{id}/photobook/pages/{num}": {
+      put: {
+        tags: ["Photobook"],
+        summary: "Update a single page's photo assignment",
+        operationId: "updatePhotobookPage",
+        security: [{ cookieAuth: [] }],
+        parameters: [
+          { name: "id", in: "path", required: true, schema: { type: "string" } },
+          { name: "num", in: "path", required: true, schema: { type: "integer" }, description: "1-based page number" },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["photoId"],
+                properties: { photoId: { type: "string", nullable: true } },
+              },
+            },
+          },
+        },
+        responses: {
+          "200": { description: "Page updated" },
+          "400": { description: "Invalid input", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
+          "401": { description: "Unauthorized", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
+          "404": { description: "Page not found", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
+        },
+      },
+    },
     "/auth/session": {
       get: {
         tags: ["Auth"],
@@ -350,6 +431,46 @@ export const openApiSpec = {
           uploadedAt: { type: "string", format: "date-time" },
           url: { type: "string", example: "/api/files/projects/cm5abc/photos/cm5xyz.jpg" },
         },
+      },
+      UpdatePhotobookRequest: {
+        type: "object",
+        properties: {
+          size: { type: "string", enum: ["A4", "A5", "SQUARE"] },
+          coverType: { type: "string", enum: ["SOFTCOVER", "HARDCOVER"] },
+        },
+      },
+      Photobook: {
+        type: "object",
+        properties: {
+          id: { type: "string", example: "cm5abc123" },
+          title: { type: "string" },
+          size: { type: "string", enum: ["A4", "A5", "SQUARE"] },
+          coverType: { type: "string", enum: ["SOFTCOVER", "HARDCOVER"] },
+          pageCount: { type: "integer", example: 10 },
+          createdAt: { type: "string", format: "date-time" },
+          updatedAt: { type: "string", format: "date-time" },
+        },
+      },
+      PhotobookPage: {
+        type: "object",
+        properties: {
+          id: { type: "string" },
+          pageNumber: { type: "integer" },
+          photoId: { type: "string", nullable: true },
+          layout: { type: "object" },
+          photo: { nullable: true, allOf: [{ $ref: "#/components/schemas/Photo" }] },
+        },
+      },
+      PhotobookDetail: {
+        allOf: [
+          { $ref: "#/components/schemas/Photobook" },
+          {
+            type: "object",
+            properties: {
+              pages: { type: "array", items: { $ref: "#/components/schemas/PhotobookPage" } },
+            },
+          },
+        ],
       },
       Error: {
         type: "object",
