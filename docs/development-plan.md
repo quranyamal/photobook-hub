@@ -11,7 +11,7 @@ Deliver the minimum viable PhotoBook Hub platform: a customer can register, uplo
 
 ---
 
-## Current State (Sprint 1 — Completed)
+## Current State (Sprint 3 Session 1 — Completed)
 
 | Area | Status |
 |---|---|
@@ -23,18 +23,23 @@ Deliver the minimum viable PhotoBook Hub platform: a customer can register, uplo
 | Swagger UI at `/api/docs` | ✅ Live |
 | Structured logging (Pino) | ✅ All required fields |
 | OpenTelemetry + Jaeger | ✅ Traces verified |
-| Test suite (21 tests, TDD) | ✅ Passing |
-| Documentation (CLAUDE.md, AGENTS.md, ADRs) | ✅ Current |
+| Test suite (53 tests, TDD) | ✅ Passing |
+| Documentation (CLAUDE.md, AGENTS.md, ADRs 0001–0007) | ✅ Current |
+| Register + Login pages (shadcn/ui forms) | ✅ Live |
+| Auth middleware — `/(app)/**` route protection | ✅ Live |
+| Dashboard page (Server Component, session-aware) | ✅ Live |
+| Project + Photo Prisma models + migration | ✅ Applied |
+| `StorageProvider` interface + `LocalStorage` impl | ✅ Done |
 
-**Not yet implemented:** Auth UI, photo upload, photobook editor, orders, admin panel, payments.
+**Not yet implemented:** Photo upload API + UI, photobook editor, orders, admin panel, payments.
 
 ---
 
 ## Critical Path to First Order
 
 ```
-Auth UI          → Sprint 2
-Photo Upload     → Sprint 3
+Auth UI          → Sprint 2  ✅ Done
+Photo Upload     → Sprint 3  🔄 In progress (Session 1 done)
 Photobook Editor → Sprint 4
 Order Placement  → Sprint 5
 Admin Panel      → Sprint 6
@@ -95,12 +100,12 @@ None — existing Auth.js + register routes cover this sprint.
 
 ### Definition of Done
 
-- [ ] Customer can register via browser form
-- [ ] Customer can log in via browser form
-- [ ] `/dashboard` requires authentication
-- [ ] Logout redirects to `/login`
-- [ ] All new pages have unit/integration tests
-- [ ] `pnpm test`, `pnpm lint`, `pnpm tsc --noEmit` pass
+- [x] Customer can register via browser form
+- [x] Customer can log in via browser form
+- [x] `/dashboard` requires authentication
+- [x] Logout redirects to `/login`
+- [x] All new pages have unit/integration tests
+- [x] `pnpm test`, `pnpm lint`, `pnpm tsc --noEmit` pass
 
 ---
 
@@ -108,46 +113,15 @@ None — existing Auth.js + register routes cover this sprint.
 
 **Goal:** A logged-in customer can create a project and upload photos to it.
 
-### Session 1 — Schema & Storage
+### Session 1 — Schema & Storage ✅ Completed
 
-**New Prisma models:**
-
-```prisma
-model Project {
-  id        String        @id @default(cuid())
-  userId    String
-  title     String
-  status    ProjectStatus @default(DRAFT)
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
-  user      User          @relation(fields: [userId], references: [id])
-  photos    Photo[]
-  @@map("projects")
-}
-
-model Photo {
-  id           String   @id @default(cuid())
-  projectId    String
-  fileName     String
-  storageKey   String
-  mimeType     String
-  sizeBytes    Int
-  width        Int?
-  height       Int?
-  uploadedAt   DateTime @default(now())
-  project      Project  @relation(fields: [projectId], references: [id])
-  @@map("photos")
-}
-
-enum ProjectStatus { DRAFT IN_PROGRESS READY }
-```
+**New Prisma models:** `Project`, `Photo`, `ProjectStatus` enum — migration `add-project-photo` applied.
 
 **Storage abstraction** `src/server/storage.ts`
-- Interface: `upload(file, key)`, `getUrl(key)`, `delete(key)`
-- Local filesystem implementation (`/tmp/uploads`) for MVP
-- Swappable for MinIO/S3 without changing route handlers
-
-Write ADR-0007: Storage strategy (local → MinIO → S3).
+- `StorageProvider` interface: `upload(key, data, mimeType)`, `getUrl(key)`, `delete(key)`
+- `LocalStorage` implementation — writes to `UPLOAD_DIR` (`.uploads/` by default)
+- `getUrl` returns `/api/files/${key}` — served by route handler in Session 2
+- ADR-0007 written: storage strategy (local → MinIO → S3)
 
 ### Session 2 — Photo Upload API
 
