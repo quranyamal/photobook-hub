@@ -55,6 +55,9 @@ export const ModelName = {
   Project: 'Project',
   Photobook: 'Photobook',
   PhotobookPage: 'PhotobookPage',
+  Order: 'Order',
+  OrderItem: 'OrderItem',
+  Payment: 'Payment',
   Photo: 'Photo'
 } as const
 
@@ -123,6 +126,51 @@ export const PhotobookPageScalarFieldEnum = {
 } as const
 
 export type PhotobookPageScalarFieldEnum = (typeof PhotobookPageScalarFieldEnum)[keyof typeof PhotobookPageScalarFieldEnum]
+
+
+export const OrderScalarFieldEnum = {
+  id: 'id',
+  orderNumber: 'orderNumber',
+  userId: 'userId',
+  status: 'status',
+  subtotal: 'subtotal',
+  shippingCost: 'shippingCost',
+  totalAmount: 'totalAmount',
+  recipientName: 'recipientName',
+  phoneNumber: 'phoneNumber',
+  addressLine: 'addressLine',
+  city: 'city',
+  province: 'province',
+  postalCode: 'postalCode',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]
+
+
+export const OrderItemScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  photobookId: 'photobookId',
+  quantity: 'quantity',
+  unitPrice: 'unitPrice'
+} as const
+
+export type OrderItemScalarFieldEnum = (typeof OrderItemScalarFieldEnum)[keyof typeof OrderItemScalarFieldEnum]
+
+
+export const PaymentScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  method: 'method',
+  amount: 'amount',
+  status: 'status',
+  referenceCode: 'referenceCode',
+  paidAt: 'paidAt'
+} as const
+
+export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum]
 
 
 export const PhotoScalarFieldEnum = {

@@ -29,11 +29,20 @@ export const BASE_PRICE_CENTS: Record<PhotobookSize, number> = {
   SQUARE: 2499, // $24.99
 };
 
-export function getTotalPriceCents(
+export const SHIPPING_COST_CENTS = 999; // $9.99 flat rate
+
+export function getSubtotalCents(
   size: PhotobookSize,
   coverType: CoverType
 ): number {
   return BASE_PRICE_CENTS[size] + COVER_CONFIG[coverType].priceAddition;
+}
+
+export function getTotalPriceCents(
+  size: PhotobookSize,
+  coverType: CoverType
+): number {
+  return getSubtotalCents(size, coverType) + SHIPPING_COST_CENTS;
 }
 
 export function formatPrice(cents: number): string {

@@ -22,6 +22,7 @@ model User {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   projects        Project[]
+  orders          Order[]
 
   @@map("users")
 }
@@ -81,6 +82,72 @@ model PhotobookPage {
   photobook   Photobook @relation(fields: [photobookId], references: [id])
 
   @@map("photobook_pages")
+}
+
+enum OrderStatus {
+  PENDING_PAYMENT
+  PAID
+  IN_PRODUCTION
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  BANK_TRANSFER
+}
+
+enum PaymentStatus {
+  AWAITING
+  CONFIRMED
+  FAILED
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  orderNumber     String      @unique
+  userId          String
+  status          OrderStatus @default(PENDING_PAYMENT)
+  subtotal        Decimal     @db.Decimal(10, 2)
+  shippingCost    Decimal     @db.Decimal(10, 2)
+  totalAmount     Decimal     @db.Decimal(10, 2)
+  recipientName   String
+  phoneNumber     String
+  addressLine     String
+  city            String
+  province        String
+  postalCode      String
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  user            User        @relation(fields: [userId], references: [id])
+  items           OrderItem[]
+  payment         Payment?
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id          String   @id @default(cuid())
+  orderId     String
+  photobookId String
+  quantity    Int      @default(1)
+  unitPrice   Decimal  @db.Decimal(10, 2)
+  order       Order    @relation(fields: [orderId], references: [id])
+
+  @@map("order_items")
+}
+
+model Payment {
+  id            String        @id @default(cuid())
+  orderId       String        @unique
+  method        PaymentMethod @default(BANK_TRANSFER)
+  amount        Decimal       @db.Decimal(10, 2)
+  status        PaymentStatus @default(AWAITING)
+  referenceCode String?
+  paidAt        DateTime?
+  order         Order         @relation(fields: [orderId], references: [id])
+
+  @@map("payments")
 }
 
 model Photo {

@@ -62,6 +62,21 @@ export type Photobook = Prisma.PhotobookModel
  */
 export type PhotobookPage = Prisma.PhotobookPageModel
 /**
+ * Model Order
+ * 
+ */
+export type Order = Prisma.OrderModel
+/**
+ * Model OrderItem
+ * 
+ */
+export type OrderItem = Prisma.OrderItemModel
+/**
+ * Model Payment
+ * 
+ */
+export type Payment = Prisma.PaymentModel
+/**
  * Model Photo
  * 
  */
