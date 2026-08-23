@@ -23,15 +23,16 @@ Deliver the minimum viable PhotoBook Hub platform: a customer can register, uplo
 | Swagger UI at `/api/docs` | ✅ Live |
 | Structured logging (Pino) | ✅ All required fields |
 | OpenTelemetry + Jaeger | ✅ Traces verified |
-| Test suite (53 tests, TDD) | ✅ Passing |
+| Test suite (80 tests, TDD) | ✅ Passing |
 | Documentation (CLAUDE.md, AGENTS.md, ADRs 0001–0007) | ✅ Current |
 | Register + Login pages (shadcn/ui forms) | ✅ Live |
 | Auth middleware — `/(app)/**` route protection | ✅ Live |
 | Dashboard page (Server Component, session-aware) | ✅ Live |
 | Project + Photo Prisma models + migration | ✅ Applied |
 | `StorageProvider` interface + `LocalStorage` impl | ✅ Done |
+| Photo upload API (6 endpoints + file serving) | ✅ Done |
 
-**Not yet implemented:** Photo upload API + UI, photobook editor, orders, admin panel, payments.
+**Not yet implemented:** Photo upload UI, photobook editor, orders, admin panel, payments.
 
 ---
 
@@ -123,18 +124,18 @@ None — existing Auth.js + register routes cover this sprint.
 - `getUrl` returns `/api/files/${key}` — served by route handler in Session 2
 - ADR-0007 written: storage strategy (local → MinIO → S3)
 
-### Session 2 — Photo Upload API
+### Session 2 — Photo Upload API ✅ Completed
 
-New route handlers (all behind auth middleware):
+Route handlers implemented (all session-guarded, 401 on unauthenticated):
 - `POST /api/projects` — create project
 - `GET /api/projects` — list user's projects
-- `GET /api/projects/[id]` — get single project detail
+- `GET /api/projects/[id]` — get single project detail with photos
 - `POST /api/projects/[id]/photos` — upload photo (multipart/form-data)
-- `GET /api/projects/[id]/photos` — list photos in project
-- `DELETE /api/projects/[id]/photos/[photoId]` — delete photo
+- `GET /api/projects/[id]/photos` — list photos with URLs
+- `DELETE /api/projects/[id]/photos/[photoId]` — delete from storage + DB
+- `GET /api/files/[...key]` — serve uploaded files (path-traversal protected)
 
-Validate: file type (JPEG/PNG only), file size (max 20 MB).
-Update Swagger spec.
+Validation: JPEG/PNG only, max 20 MB. Swagger spec updated with Projects + Photos tags.
 
 ### Session 3 — Photo Upload UI
 

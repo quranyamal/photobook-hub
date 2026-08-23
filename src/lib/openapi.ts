@@ -17,6 +17,8 @@ export const openApiSpec = {
   ],
   tags: [
     { name: "Auth", description: "Authentication and registration" },
+    { name: "Projects", description: "Photobook project management" },
+    { name: "Photos", description: "Photo uploads within a project" },
   ],
   paths: {
     "/auth/register": {
@@ -106,6 +108,114 @@ export const openApiSpec = {
         },
       },
     },
+    "/projects": {
+      post: {
+        tags: ["Projects"],
+        summary: "Create a new project",
+        operationId: "createProject",
+        security: [{ cookieAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/CreateProjectRequest" },
+              example: { title: "Summer 2026" },
+            },
+          },
+        },
+        responses: {
+          "201": {
+            description: "Project created",
+            content: { "application/json": { schema: { $ref: "#/components/schemas/Project" } } },
+          },
+          "400": { description: "Validation failed", content: { "application/json": { schema: { $ref: "#/components/schemas/ValidationError" } } } },
+          "401": { description: "Unauthorized", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
+        },
+      },
+      get: {
+        tags: ["Projects"],
+        summary: "List current user's projects",
+        operationId: "listProjects",
+        security: [{ cookieAuth: [] }],
+        responses: {
+          "200": {
+            description: "List of projects",
+            content: { "application/json": { schema: { type: "array", items: { $ref: "#/components/schemas/ProjectSummary" } } } },
+          },
+          "401": { description: "Unauthorized", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
+        },
+      },
+    },
+    "/projects/{id}": {
+      get: {
+        tags: ["Projects"],
+        summary: "Get a project with its photos",
+        operationId: "getProject",
+        security: [{ cookieAuth: [] }],
+        parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
+        responses: {
+          "200": { description: "Project detail", content: { "application/json": { schema: { $ref: "#/components/schemas/ProjectDetail" } } } },
+          "401": { description: "Unauthorized", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
+          "404": { description: "Project not found", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
+        },
+      },
+    },
+    "/projects/{id}/photos": {
+      post: {
+        tags: ["Photos"],
+        summary: "Upload a photo to a project",
+        operationId: "uploadPhoto",
+        security: [{ cookieAuth: [] }],
+        parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
+        requestBody: {
+          required: true,
+          content: {
+            "multipart/form-data": {
+              schema: {
+                type: "object",
+                required: ["file"],
+                properties: { file: { type: "string", format: "binary", description: "JPEG or PNG, max 20 MB" } },
+              },
+            },
+          },
+        },
+        responses: {
+          "201": { description: "Photo uploaded", content: { "application/json": { schema: { $ref: "#/components/schemas/Photo" } } } },
+          "400": { description: "Invalid file", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
+          "401": { description: "Unauthorized", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
+          "404": { description: "Project not found", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
+        },
+      },
+      get: {
+        tags: ["Photos"],
+        summary: "List photos in a project",
+        operationId: "listPhotos",
+        security: [{ cookieAuth: [] }],
+        parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
+        responses: {
+          "200": { description: "List of photos", content: { "application/json": { schema: { type: "array", items: { $ref: "#/components/schemas/Photo" } } } } },
+          "401": { description: "Unauthorized", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
+          "404": { description: "Project not found", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
+        },
+      },
+    },
+    "/projects/{id}/photos/{photoId}": {
+      delete: {
+        tags: ["Photos"],
+        summary: "Delete a photo",
+        operationId: "deletePhoto",
+        security: [{ cookieAuth: [] }],
+        parameters: [
+          { name: "id", in: "path", required: true, schema: { type: "string" } },
+          { name: "photoId", in: "path", required: true, schema: { type: "string" } },
+        ],
+        responses: {
+          "204": { description: "Photo deleted" },
+          "401": { description: "Unauthorized", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
+          "404": { description: "Photo not found", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
+        },
+      },
+    },
     "/auth/session": {
       get: {
         tags: ["Auth"],
@@ -183,6 +293,62 @@ export const openApiSpec = {
             },
           },
           expires: { type: "string", format: "date-time" },
+        },
+      },
+      CreateProjectRequest: {
+        type: "object",
+        required: ["title"],
+        properties: {
+          title: { type: "string", minLength: 1, maxLength: 100, example: "Summer 2026" },
+        },
+      },
+      Project: {
+        type: "object",
+        properties: {
+          id: { type: "string", example: "cm5abc123" },
+          title: { type: "string" },
+          status: { type: "string", enum: ["DRAFT", "IN_PROGRESS", "READY"] },
+          createdAt: { type: "string", format: "date-time" },
+          updatedAt: { type: "string", format: "date-time" },
+        },
+      },
+      ProjectSummary: {
+        allOf: [
+          { $ref: "#/components/schemas/Project" },
+          {
+            type: "object",
+            properties: {
+              _count: {
+                type: "object",
+                properties: { photos: { type: "integer" } },
+              },
+            },
+          },
+        ],
+      },
+      ProjectDetail: {
+        allOf: [
+          { $ref: "#/components/schemas/Project" },
+          {
+            type: "object",
+            properties: {
+              photos: { type: "array", items: { $ref: "#/components/schemas/Photo" } },
+            },
+          },
+        ],
+      },
+      Photo: {
+        type: "object",
+        properties: {
+          id: { type: "string", example: "cm5xyz456" },
+          fileName: { type: "string", example: "vacation.jpg" },
+          storageKey: { type: "string" },
+          mimeType: { type: "string", example: "image/jpeg" },
+          sizeBytes: { type: "integer", example: 2048000 },
+          width: { type: "integer", nullable: true },
+          height: { type: "integer", nullable: true },
+          uploadedAt: { type: "string", format: "date-time" },
+          url: { type: "string", example: "/api/files/projects/cm5abc/photos/cm5xyz.jpg" },
         },
       },
       Error: {
