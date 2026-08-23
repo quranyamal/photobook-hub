@@ -192,6 +192,7 @@ export type ProjectWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   photos?: Prisma.PhotoListRelationFilter
+  photobook?: Prisma.XOR<Prisma.PhotobookNullableScalarRelationFilter, Prisma.PhotobookWhereInput> | null
 }
 
 export type ProjectOrderByWithRelationInput = {
@@ -203,6 +204,7 @@ export type ProjectOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   photos?: Prisma.PhotoOrderByRelationAggregateInput
+  photobook?: Prisma.PhotobookOrderByWithRelationInput
 }
 
 export type ProjectWhereUniqueInput = Prisma.AtLeast<{
@@ -217,6 +219,7 @@ export type ProjectWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   photos?: Prisma.PhotoListRelationFilter
+  photobook?: Prisma.XOR<Prisma.PhotobookNullableScalarRelationFilter, Prisma.PhotobookWhereInput> | null
 }, "id">
 
 export type ProjectOrderByWithAggregationInput = {
@@ -251,6 +254,7 @@ export type ProjectCreateInput = {
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProjectsInput
   photos?: Prisma.PhotoCreateNestedManyWithoutProjectInput
+  photobook?: Prisma.PhotobookCreateNestedOneWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateInput = {
@@ -261,6 +265,7 @@ export type ProjectUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   photos?: Prisma.PhotoUncheckedCreateNestedManyWithoutProjectInput
+  photobook?: Prisma.PhotobookUncheckedCreateNestedOneWithoutProjectInput
 }
 
 export type ProjectUpdateInput = {
@@ -271,6 +276,7 @@ export type ProjectUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   photos?: Prisma.PhotoUpdateManyWithoutProjectNestedInput
+  photobook?: Prisma.PhotobookUpdateOneWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateInput = {
@@ -281,6 +287,7 @@ export type ProjectUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   photos?: Prisma.PhotoUncheckedUpdateManyWithoutProjectNestedInput
+  photobook?: Prisma.PhotobookUncheckedUpdateOneWithoutProjectNestedInput
 }
 
 export type ProjectCreateManyInput = {
@@ -397,6 +404,20 @@ export type EnumProjectStatusFieldUpdateOperationsInput = {
   set?: $Enums.ProjectStatus
 }
 
+export type ProjectCreateNestedOneWithoutPhotobookInput = {
+  create?: Prisma.XOR<Prisma.ProjectCreateWithoutPhotobookInput, Prisma.ProjectUncheckedCreateWithoutPhotobookInput>
+  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutPhotobookInput
+  connect?: Prisma.ProjectWhereUniqueInput
+}
+
+export type ProjectUpdateOneRequiredWithoutPhotobookNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectCreateWithoutPhotobookInput, Prisma.ProjectUncheckedCreateWithoutPhotobookInput>
+  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutPhotobookInput
+  upsert?: Prisma.ProjectUpsertWithoutPhotobookInput
+  connect?: Prisma.ProjectWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectUpdateToOneWithWhereWithoutPhotobookInput, Prisma.ProjectUpdateWithoutPhotobookInput>, Prisma.ProjectUncheckedUpdateWithoutPhotobookInput>
+}
+
 export type ProjectCreateNestedOneWithoutPhotosInput = {
   create?: Prisma.XOR<Prisma.ProjectCreateWithoutPhotosInput, Prisma.ProjectUncheckedCreateWithoutPhotosInput>
   connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutPhotosInput
@@ -418,6 +439,7 @@ export type ProjectCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   photos?: Prisma.PhotoCreateNestedManyWithoutProjectInput
+  photobook?: Prisma.PhotobookCreateNestedOneWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutUserInput = {
@@ -427,6 +449,7 @@ export type ProjectUncheckedCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   photos?: Prisma.PhotoUncheckedCreateNestedManyWithoutProjectInput
+  photobook?: Prisma.PhotobookUncheckedCreateNestedOneWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutUserInput = {
@@ -467,6 +490,62 @@ export type ProjectScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Project"> | Date | string
 }
 
+export type ProjectCreateWithoutPhotobookInput = {
+  id?: string
+  title: string
+  status?: $Enums.ProjectStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutProjectsInput
+  photos?: Prisma.PhotoCreateNestedManyWithoutProjectInput
+}
+
+export type ProjectUncheckedCreateWithoutPhotobookInput = {
+  id?: string
+  userId: string
+  title: string
+  status?: $Enums.ProjectStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  photos?: Prisma.PhotoUncheckedCreateNestedManyWithoutProjectInput
+}
+
+export type ProjectCreateOrConnectWithoutPhotobookInput = {
+  where: Prisma.ProjectWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProjectCreateWithoutPhotobookInput, Prisma.ProjectUncheckedCreateWithoutPhotobookInput>
+}
+
+export type ProjectUpsertWithoutPhotobookInput = {
+  update: Prisma.XOR<Prisma.ProjectUpdateWithoutPhotobookInput, Prisma.ProjectUncheckedUpdateWithoutPhotobookInput>
+  create: Prisma.XOR<Prisma.ProjectCreateWithoutPhotobookInput, Prisma.ProjectUncheckedCreateWithoutPhotobookInput>
+  where?: Prisma.ProjectWhereInput
+}
+
+export type ProjectUpdateToOneWithWhereWithoutPhotobookInput = {
+  where?: Prisma.ProjectWhereInput
+  data: Prisma.XOR<Prisma.ProjectUpdateWithoutPhotobookInput, Prisma.ProjectUncheckedUpdateWithoutPhotobookInput>
+}
+
+export type ProjectUpdateWithoutPhotobookInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  photos?: Prisma.PhotoUpdateManyWithoutProjectNestedInput
+}
+
+export type ProjectUncheckedUpdateWithoutPhotobookInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  photos?: Prisma.PhotoUncheckedUpdateManyWithoutProjectNestedInput
+}
+
 export type ProjectCreateWithoutPhotosInput = {
   id?: string
   title: string
@@ -474,6 +553,7 @@ export type ProjectCreateWithoutPhotosInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProjectsInput
+  photobook?: Prisma.PhotobookCreateNestedOneWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutPhotosInput = {
@@ -483,6 +563,7 @@ export type ProjectUncheckedCreateWithoutPhotosInput = {
   status?: $Enums.ProjectStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  photobook?: Prisma.PhotobookUncheckedCreateNestedOneWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutPhotosInput = {
@@ -508,6 +589,7 @@ export type ProjectUpdateWithoutPhotosInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  photobook?: Prisma.PhotobookUpdateOneWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutPhotosInput = {
@@ -517,6 +599,7 @@ export type ProjectUncheckedUpdateWithoutPhotosInput = {
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  photobook?: Prisma.PhotobookUncheckedUpdateOneWithoutProjectNestedInput
 }
 
 export type ProjectCreateManyUserInput = {
@@ -534,6 +617,7 @@ export type ProjectUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   photos?: Prisma.PhotoUpdateManyWithoutProjectNestedInput
+  photobook?: Prisma.PhotobookUpdateOneWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutUserInput = {
@@ -543,6 +627,7 @@ export type ProjectUncheckedUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   photos?: Prisma.PhotoUncheckedUpdateManyWithoutProjectNestedInput
+  photobook?: Prisma.PhotobookUncheckedUpdateOneWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateManyWithoutUserInput = {
@@ -593,6 +678,7 @@ export type ProjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   photos?: boolean | Prisma.Project$photosArgs<ExtArgs>
+  photobook?: boolean | Prisma.Project$photobookArgs<ExtArgs>
   _count?: boolean | Prisma.ProjectCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["project"]>
 
@@ -629,6 +715,7 @@ export type ProjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
 export type ProjectInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   photos?: boolean | Prisma.Project$photosArgs<ExtArgs>
+  photobook?: boolean | Prisma.Project$photobookArgs<ExtArgs>
   _count?: boolean | Prisma.ProjectCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ProjectIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -643,6 +730,7 @@ export type $ProjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
     photos: Prisma.$PhotoPayload<ExtArgs>[]
+    photobook: Prisma.$PhotobookPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1047,6 +1135,7 @@ export interface Prisma__ProjectClient<T, Null = never, ExtArgs extends runtime.
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   photos<T extends Prisma.Project$photosArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$photosArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PhotoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  photobook<T extends Prisma.Project$photobookArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$photobookArgs<ExtArgs>>): Prisma.Prisma__PhotobookClient<runtime.Types.Result.GetResult<Prisma.$PhotobookPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1504,6 +1593,25 @@ export type Project$photosArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   distinct?: Prisma.PhotoScalarFieldEnum | Prisma.PhotoScalarFieldEnum[]
+}
+
+/**
+ * Project.photobook
+ */
+export type Project$photobookArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Photobook
+   */
+  select?: Prisma.PhotobookSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Photobook
+   */
+  omit?: Prisma.PhotobookOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PhotobookInclude<ExtArgs> | null
+  where?: Prisma.PhotobookWhereInput
 }
 
 /**

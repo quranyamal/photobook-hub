@@ -10,5 +10,7 @@
  */
 export type * from './models/User'
 export type * from './models/Project'
+export type * from './models/Photobook'
+export type * from './models/PhotobookPage'
 export type * from './models/Photo'
 export type * from './commonInputTypes'

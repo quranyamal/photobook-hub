@@ -386,6 +386,8 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   User: 'User',
   Project: 'Project',
+  Photobook: 'Photobook',
+  PhotobookPage: 'PhotobookPage',
   Photo: 'Photo'
 } as const
 
@@ -402,7 +404,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "project" | "photo"
+    modelProps: "user" | "project" | "photobook" | "photobookPage" | "photo"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -554,6 +556,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Photobook: {
+      payload: Prisma.$PhotobookPayload<ExtArgs>
+      fields: Prisma.PhotobookFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PhotobookFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotobookPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PhotobookFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotobookPayload>
+        }
+        findFirst: {
+          args: Prisma.PhotobookFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotobookPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PhotobookFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotobookPayload>
+        }
+        findMany: {
+          args: Prisma.PhotobookFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotobookPayload>[]
+        }
+        create: {
+          args: Prisma.PhotobookCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotobookPayload>
+        }
+        createMany: {
+          args: Prisma.PhotobookCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PhotobookCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotobookPayload>[]
+        }
+        delete: {
+          args: Prisma.PhotobookDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotobookPayload>
+        }
+        update: {
+          args: Prisma.PhotobookUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotobookPayload>
+        }
+        deleteMany: {
+          args: Prisma.PhotobookDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PhotobookUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PhotobookUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotobookPayload>[]
+        }
+        upsert: {
+          args: Prisma.PhotobookUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotobookPayload>
+        }
+        aggregate: {
+          args: Prisma.PhotobookAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePhotobook>
+        }
+        groupBy: {
+          args: Prisma.PhotobookGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PhotobookGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PhotobookCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PhotobookCountAggregateOutputType> | number
+        }
+      }
+    }
+    PhotobookPage: {
+      payload: Prisma.$PhotobookPagePayload<ExtArgs>
+      fields: Prisma.PhotobookPageFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PhotobookPageFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotobookPagePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PhotobookPageFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotobookPagePayload>
+        }
+        findFirst: {
+          args: Prisma.PhotobookPageFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotobookPagePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PhotobookPageFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotobookPagePayload>
+        }
+        findMany: {
+          args: Prisma.PhotobookPageFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotobookPagePayload>[]
+        }
+        create: {
+          args: Prisma.PhotobookPageCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotobookPagePayload>
+        }
+        createMany: {
+          args: Prisma.PhotobookPageCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PhotobookPageCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotobookPagePayload>[]
+        }
+        delete: {
+          args: Prisma.PhotobookPageDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotobookPagePayload>
+        }
+        update: {
+          args: Prisma.PhotobookPageUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotobookPagePayload>
+        }
+        deleteMany: {
+          args: Prisma.PhotobookPageDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PhotobookPageUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PhotobookPageUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotobookPagePayload>[]
+        }
+        upsert: {
+          args: Prisma.PhotobookPageUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotobookPagePayload>
+        }
+        aggregate: {
+          args: Prisma.PhotobookPageAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePhotobookPage>
+        }
+        groupBy: {
+          args: Prisma.PhotobookPageGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PhotobookPageGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PhotobookPageCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PhotobookPageCountAggregateOutputType> | number
+        }
+      }
+    }
     Photo: {
       payload: Prisma.$PhotoPayload<ExtArgs>
       fields: Prisma.PhotoFieldRefs
@@ -693,6 +843,31 @@ export const ProjectScalarFieldEnum = {
 export type ProjectScalarFieldEnum = (typeof ProjectScalarFieldEnum)[keyof typeof ProjectScalarFieldEnum]
 
 
+export const PhotobookScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  title: 'title',
+  size: 'size',
+  coverType: 'coverType',
+  pageCount: 'pageCount',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PhotobookScalarFieldEnum = (typeof PhotobookScalarFieldEnum)[keyof typeof PhotobookScalarFieldEnum]
+
+
+export const PhotobookPageScalarFieldEnum = {
+  id: 'id',
+  photobookId: 'photobookId',
+  pageNumber: 'pageNumber',
+  photoId: 'photoId',
+  layout: 'layout'
+} as const
+
+export type PhotobookPageScalarFieldEnum = (typeof PhotobookPageScalarFieldEnum)[keyof typeof PhotobookPageScalarFieldEnum]
+
+
 export const PhotoScalarFieldEnum = {
   id: 'id',
   projectId: 'projectId',
@@ -716,6 +891,13 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
 export const QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
@@ -730,6 +912,15 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
 
@@ -795,6 +986,34 @@ export type ListEnumProjectStatusFieldRefInput<$PrismaModel> = FieldRefInputType
 
 
 /**
+ * Reference to a field of type 'PhotobookSize'
+ */
+export type EnumPhotobookSizeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PhotobookSize'>
+    
+
+
+/**
+ * Reference to a field of type 'PhotobookSize[]'
+ */
+export type ListEnumPhotobookSizeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PhotobookSize[]'>
+    
+
+
+/**
+ * Reference to a field of type 'CoverType'
+ */
+export type EnumCoverTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CoverType'>
+    
+
+
+/**
+ * Reference to a field of type 'CoverType[]'
+ */
+export type ListEnumCoverTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CoverType[]'>
+    
+
+
+/**
  * Reference to a field of type 'Int'
  */
 export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
@@ -805,6 +1024,20 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
  * Reference to a field of type 'Int[]'
  */
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Json'
+ */
+export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+/**
+ * Reference to a field of type 'QueryMode'
+ */
+export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -933,6 +1166,8 @@ export type PrismaClientOptions = ({
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   project?: Prisma.ProjectOmit
+  photobook?: Prisma.PhotobookOmit
+  photobookPage?: Prisma.PhotobookPageOmit
   photo?: Prisma.PhotoOmit
 }
 

@@ -24,3 +24,20 @@ export const ProjectStatus = {
 } as const
 
 export type ProjectStatus = (typeof ProjectStatus)[keyof typeof ProjectStatus]
+
+
+export const PhotobookSize = {
+  A4: 'A4',
+  A5: 'A5',
+  SQUARE: 'SQUARE'
+} as const
+
+export type PhotobookSize = (typeof PhotobookSize)[keyof typeof PhotobookSize]
+
+
+export const CoverType = {
+  SOFTCOVER: 'SOFTCOVER',
+  HARDCOVER: 'HARDCOVER'
+} as const
+
+export type CoverType = (typeof CoverType)[keyof typeof CoverType]

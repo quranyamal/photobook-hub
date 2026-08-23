@@ -53,6 +53,8 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   User: 'User',
   Project: 'Project',
+  Photobook: 'Photobook',
+  PhotobookPage: 'PhotobookPage',
   Photo: 'Photo'
 } as const
 
@@ -98,6 +100,31 @@ export const ProjectScalarFieldEnum = {
 export type ProjectScalarFieldEnum = (typeof ProjectScalarFieldEnum)[keyof typeof ProjectScalarFieldEnum]
 
 
+export const PhotobookScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  title: 'title',
+  size: 'size',
+  coverType: 'coverType',
+  pageCount: 'pageCount',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PhotobookScalarFieldEnum = (typeof PhotobookScalarFieldEnum)[keyof typeof PhotobookScalarFieldEnum]
+
+
+export const PhotobookPageScalarFieldEnum = {
+  id: 'id',
+  photobookId: 'photobookId',
+  pageNumber: 'pageNumber',
+  photoId: 'photoId',
+  layout: 'layout'
+} as const
+
+export type PhotobookPageScalarFieldEnum = (typeof PhotobookPageScalarFieldEnum)[keyof typeof PhotobookPageScalarFieldEnum]
+
+
 export const PhotoScalarFieldEnum = {
   id: 'id',
   projectId: 'projectId',
@@ -121,6 +148,13 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
 export const QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
@@ -135,4 +169,13 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 

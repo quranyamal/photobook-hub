@@ -52,6 +52,16 @@ export type User = Prisma.UserModel
  */
 export type Project = Prisma.ProjectModel
 /**
+ * Model Photobook
+ * 
+ */
+export type Photobook = Prisma.PhotobookModel
+/**
+ * Model PhotobookPage
+ * 
+ */
+export type PhotobookPage = Prisma.PhotobookPageModel
+/**
  * Model Photo
  * 
  */
