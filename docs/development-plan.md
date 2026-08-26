@@ -320,17 +320,23 @@ Shipping address as scalar fields on `Order`. Migration: `add-orders`.
 
 **Goal:** The production team can view orders, confirm payments, download print-ready assets, and update order status.
 
-### Session 1 — Admin Schema & Auth
+### Session 1 — Admin Schema & Auth ✅ Completed
 
-- Add admin role check to middleware — only `UserRole.ADMIN` can access `/admin/**`
-- Seed one admin user via a migration or seed script
+- `UserRole` enum and `role` field on `User` were already in schema (added during Sprint 5 Session 1)
+- Middleware updated: `/admin/**` requires authentication + `ADMIN` role; non-admins redirected to `/dashboard`
+- `prisma/seed.ts` — upserts admin user; run via `npx tsx prisma/seed.ts` or `pnpm db:seed`
+- `.env.example` created; `ADMIN_EMAIL` / `ADMIN_PASSWORD` added to `.env`
+- 5 new middleware tests (118 total passing)
 
-### Session 2 — Admin API
+### Session 2 — Admin API ✅ Completed
 
-- `GET /api/admin/orders` — list all orders with status filter
-- `PUT /api/admin/orders/[id]/payment` — confirm or reject payment
-- `GET /api/admin/orders/[id]/assets` — generate download link for print-ready files
-- `PUT /api/admin/orders/[id]/status` — update order status (IN_PRODUCTION → SHIPPED etc.)
+- `src/lib/require-admin.ts` — shared auth guard (401 unauthenticated, 403 non-admin)
+- `GET /api/admin/orders` — list all orders; optional `?status=` filter
+- `GET /api/admin/orders/[id]` — full order detail (customer, items, payment)
+- `PUT /api/admin/orders/[id]/payment` — `{ action: "confirm" | "reject" }`; confirm → PAID, reject → FAILED (order stays PENDING_PAYMENT for resubmission)
+- `PUT /api/admin/orders/[id]/status` — enforces linear transitions: PAID → IN_PRODUCTION → SHIPPED → DELIVERED
+- `GET /api/admin/orders/[id]/assets` — streams ZIP of all page photos named `page-NNN-filename`
+- 30 new tests (148 total passing); `archiver` added as dependency (IN_PRODUCTION → SHIPPED etc.)
 
 ### Session 3 — Admin UI
 
