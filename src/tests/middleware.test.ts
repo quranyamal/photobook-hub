@@ -17,20 +17,32 @@ jest.mock("@/lib/auth.config", () => ({
   authConfig: {},
 }));
 
+jest.mock("@/generated/prisma/enums", () => ({
+  UserRole: { CUSTOMER: "CUSTOMER", ADMIN: "ADMIN" },
+}));
+
 import middleware from "@/middleware";
 import { NextRequest } from "next/server";
 
 type AuthRequest = NextRequest & { auth: unknown };
 
-const makeReq = (pathname: string, authenticated: boolean): AuthRequest => {
+const makeReq = (
+  pathname: string,
+  authenticated: boolean,
+  role = "CUSTOMER"
+): AuthRequest => {
   const req = new NextRequest(`http://localhost${pathname}`) as AuthRequest;
-  req.auth = authenticated ? { user: { id: "u1", email: "a@b.com" } } : null;
+  req.auth = authenticated ? { user: { id: "u1", email: "a@b.com", role } } : null;
   return req;
 };
 
-const invoke = (pathname: string, authenticated: boolean): Response =>
+const invoke = (
+  pathname: string,
+  authenticated: boolean,
+  role = "CUSTOMER"
+): Response =>
   (middleware as unknown as (req: AuthRequest) => Response)(
-    makeReq(pathname, authenticated)
+    makeReq(pathname, authenticated, role)
   );
 
 describe("middleware", () => {
@@ -72,6 +84,36 @@ describe("middleware", () => {
 
     it("passes unauthenticated /api/auth/session through", () => {
       const res = invoke("/api/auth/session", false);
+      expect(res.status).not.toBe(307);
+    });
+  });
+
+  describe("admin routes", () => {
+    it("redirects unauthenticated /admin → /login", () => {
+      const res = invoke("/admin", false);
+      expect(res.status).toBe(307);
+      expect(res.headers.get("location")).toContain("/login");
+    });
+
+    it("redirects authenticated CUSTOMER /admin → /dashboard", () => {
+      const res = invoke("/admin", true, "CUSTOMER");
+      expect(res.status).toBe(307);
+      expect(res.headers.get("location")).toContain("/dashboard");
+    });
+
+    it("redirects authenticated CUSTOMER /admin/orders → /dashboard", () => {
+      const res = invoke("/admin/orders", true, "CUSTOMER");
+      expect(res.status).toBe(307);
+      expect(res.headers.get("location")).toContain("/dashboard");
+    });
+
+    it("passes authenticated ADMIN /admin through", () => {
+      const res = invoke("/admin", true, "ADMIN");
+      expect(res.status).not.toBe(307);
+    });
+
+    it("passes authenticated ADMIN /admin/orders through", () => {
+      const res = invoke("/admin/orders", true, "ADMIN");
       expect(res.status).not.toBe(307);
     });
   });
