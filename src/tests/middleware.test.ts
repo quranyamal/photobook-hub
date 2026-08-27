@@ -21,17 +21,25 @@ jest.mock("@/generated/prisma/enums", () => ({
   UserRole: { CUSTOMER: "CUSTOMER", ADMIN: "ADMIN" },
 }));
 
+jest.mock("@/lib/rate-limit", () => ({
+  checkRateLimit: jest.fn().mockReturnValue(true),
+}));
+
 import middleware from "@/middleware";
 import { NextRequest } from "next/server";
+import { checkRateLimit } from "@/lib/rate-limit";
+
+const mockCheckRateLimit = checkRateLimit as jest.Mock;
 
 type AuthRequest = NextRequest & { auth: unknown };
 
 const makeReq = (
   pathname: string,
   authenticated: boolean,
-  role = "CUSTOMER"
+  role = "CUSTOMER",
+  method = "GET"
 ): AuthRequest => {
-  const req = new NextRequest(`http://localhost${pathname}`) as AuthRequest;
+  const req = new NextRequest(`http://localhost${pathname}`, { method }) as AuthRequest;
   req.auth = authenticated ? { user: { id: "u1", email: "a@b.com", role } } : null;
   return req;
 };
@@ -39,10 +47,11 @@ const makeReq = (
 const invoke = (
   pathname: string,
   authenticated: boolean,
-  role = "CUSTOMER"
+  role = "CUSTOMER",
+  method = "GET"
 ): Response =>
   (middleware as unknown as (req: AuthRequest) => Response)(
-    makeReq(pathname, authenticated, role)
+    makeReq(pathname, authenticated, role, method)
   );
 
 describe("middleware", () => {
@@ -115,6 +124,33 @@ describe("middleware", () => {
     it("passes authenticated ADMIN /admin/orders through", () => {
       const res = invoke("/admin/orders", true, "ADMIN");
       expect(res.status).not.toBe(307);
+    });
+  });
+
+  describe("rate limiting on auth POST endpoints", () => {
+    beforeEach(() => mockCheckRateLimit.mockReturnValue(true));
+
+    it("returns 429 on POST /api/auth/register when rate limit exceeded", () => {
+      mockCheckRateLimit.mockReturnValueOnce(false);
+      const res = invoke("/api/auth/register", false, "CUSTOMER", "POST");
+      expect(res.status).toBe(429);
+    });
+
+    it("returns 429 on POST /api/auth/callback/credentials when rate limit exceeded", () => {
+      mockCheckRateLimit.mockReturnValueOnce(false);
+      const res = invoke("/api/auth/callback/credentials", false, "CUSTOMER", "POST");
+      expect(res.status).toBe(429);
+    });
+
+    it("passes POST /api/auth/register through when under limit", () => {
+      const res = invoke("/api/auth/register", false, "CUSTOMER", "POST");
+      expect(res.status).not.toBe(429);
+    });
+
+    it("does not rate-limit GET requests on auth paths", () => {
+      mockCheckRateLimit.mockReturnValueOnce(false);
+      const res = invoke("/api/auth/register", false, "CUSTOMER", "GET");
+      expect(res.status).not.toBe(429);
     });
   });
 

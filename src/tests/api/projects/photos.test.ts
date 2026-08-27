@@ -37,12 +37,22 @@ const mockStorageDelete = storage.delete as jest.Mock;
 const authedSession = { user: { id: "user_01", email: "a@b.com" } };
 const project = { id: "proj_01" };
 
+const JPEG_MAGIC = new Uint8Array([0xff, 0xd8, 0xff, 0xe0]);
+const PNG_MAGIC = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+
 const makePhotoRequest = (
   fileName = "photo.jpg",
   size = 1024,
-  mimeType = "image/jpeg"
+  mimeType = "image/jpeg",
+  content?: Uint8Array
 ) => {
-  const file = new File([new Uint8Array(size)], fileName, { type: mimeType });
+  const magic = mimeType === "image/jpeg" ? JPEG_MAGIC : PNG_MAGIC;
+  const buf = content ?? (() => {
+    const b = new Uint8Array(Math.max(size, magic.length));
+    b.set(magic);
+    return b;
+  })();
+  const file = new File([buf.buffer as ArrayBuffer], fileName, { type: mimeType });
   const formData = new FormData();
   formData.append("file", file);
   return new Request("http://localhost/api/projects/proj_01/photos", {
@@ -114,6 +124,26 @@ describe("POST /api/projects/[id]/photos", () => {
     const res = await POST(makePhotoRequest("anim.gif", 1024, "image/gif"), photosParams);
     expect(res.status).toBe(400);
     expect((await res.json()).error).toMatch(/invalid file type/i);
+  });
+
+  it("returns 400 when file content does not match JPEG magic bytes", async () => {
+    const invalidContent = new Uint8Array([0x00, 0x00, 0x00, 0x00]); // no magic bytes
+    const res = await POST(
+      makePhotoRequest("fake.jpg", 4, "image/jpeg", invalidContent),
+      photosParams
+    );
+    expect(res.status).toBe(400);
+    expect((await res.json()).error).toMatch(/content does not match/i);
+  });
+
+  it("returns 400 when file content does not match PNG magic bytes", async () => {
+    const invalidContent = new Uint8Array([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
+    const res = await POST(
+      makePhotoRequest("fake.png", 8, "image/png", invalidContent),
+      photosParams
+    );
+    expect(res.status).toBe(400);
+    expect((await res.json()).error).toMatch(/content does not match/i);
   });
 
   it("returns 400 when file exceeds 20 MB", async () => {

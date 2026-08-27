@@ -375,12 +375,19 @@ Shipping address as scalar fields on `Order`. Migration: `add-orders`.
   - Test 8 false-positive: assertion on button-text-change during loading (not actual DB state) → fixed to assert on the post-refresh "Mark as In production" button
 - 10 E2E tests passing; 148 unit tests still passing
 
-### Session 2 — Security & Hardening
+### Session 2 — Security & Hardening ✅ Completed
 
-- Security review: input validation, file upload safety, auth on all protected routes
-- Rate limiting on register and login endpoints
-- `.env` audit — confirm no secrets committed
-- CORS headers review
+**Auth guard audit:** All 13 protected route handlers verified — `/api/projects/**` and `/api/orders/**` use `auth()`, `/api/admin/**` use `requireAdmin()` (401 + 403). `/api/files/[...key]` is intentionally public (serves photo thumbnails with path-traversal guard already in place).
+
+**Rate limiting:** `src/lib/rate-limit.ts` — in-memory Map-based limiter (10 req/min per IP). Applied in middleware to `POST /api/auth/register` and `POST /api/auth/callback/credentials` (NextAuth credentials signin). Returns 429 with JSON body. Appropriate for single-instance VPS; not suitable for multi-instance or edge deployments.
+
+**Magic-byte validation:** `POST /api/projects/[id]/photos` now verifies file content against JPEG (`FF D8 FF`) and PNG (`89 50 4E 47...`) signatures after reading the buffer. Returns 400 if content doesn't match declared MIME type. Prevents MIME-sniffing attacks.
+
+**CORS:** No configuration needed — Next.js serves both frontend and API from the same origin. No cross-origin API consumers exist.
+
+**`.env` audit:** `.env` is gitignored via `.env*` pattern ✓. `.env.example` committed with no real secrets ✓. All env access routes through `src/config/env.ts` ✓.
+
+**Tests:** 6 new unit tests (154 total — 4 rate-limit middleware tests, 2 magic-byte rejection tests).
 
 ### Session 3 — Deployment & Monitoring
 

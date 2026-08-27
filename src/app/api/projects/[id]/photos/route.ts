@@ -16,6 +16,16 @@ const MIME_TO_EXT: Record<string, string> = {
 };
 const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20 MB
 
+const MAGIC: Record<string, number[]> = {
+  "image/jpeg": [0xff, 0xd8, 0xff],
+  "image/png": [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a],
+};
+
+function hasValidMagicBytes(buffer: Buffer, mimeType: string): boolean {
+  const sig = MAGIC[mimeType];
+  return !!sig && sig.every((byte, i) => buffer[i] === byte);
+}
+
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -73,6 +83,14 @@ export async function POST(
     const ext = MIME_TO_EXT[file.type];
     const storageKey = `projects/${projectId}/photos/${crypto.randomUUID()}${ext}`;
     const buffer = Buffer.from(await file.arrayBuffer());
+
+    if (!hasValidMagicBytes(buffer, file.type)) {
+      logResponse(log, 400, start, { mimeType: file.type, reason: "magic-bytes" });
+      return NextResponse.json(
+        { error: "File content does not match its declared type." },
+        { status: 400 }
+      );
+    }
 
     await storage.upload(storageKey, buffer, file.type);
 
