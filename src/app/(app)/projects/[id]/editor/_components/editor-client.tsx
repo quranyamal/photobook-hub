@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -61,6 +61,11 @@ export function EditorClient({
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Sync state when server refreshes props (e.g. after router.refresh() post-creation)
+  useEffect(() => {
+    setPhotobook(initialPhotobook);
+  }, [initialPhotobook]);
 
   const handleCreate = async () => {
     setLoading(true);

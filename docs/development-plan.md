@@ -362,11 +362,18 @@ Shipping address as scalar fields on `Order`. Migration: `add-orders`.
 
 **Goal:** The platform is stable, observable, and ready for the first real customer.
 
-### Session 1 — End-to-End Testing
+### Session 1 — End-to-End Testing ✅ Completed
 
-- Write Playwright E2E tests for the full critical path:
-  - Registration → Login → Create Project → Upload Photos → Create Photobook → Place Order → Submit Payment
-- Fix any discovered issues
+- Installed `@playwright/test`; separate `photobook_test` database for isolation
+- `playwright.config.ts` — webServer on port 3001 with `DATABASE_URL=photobook_test`; `TEST_DATABASE_URL` added to `.env`
+- `e2e/global-setup.ts` — runs `prisma migrate deploy` on test DB, truncates all rows, seeds admin user using `pg` pool directly (avoids CJS/ESM issues in Playwright context)
+- `e2e/critical-path.spec.ts` — 10 tests in `test.describe.serial`:
+  - Customer: register → login → create project → upload photo → create photobook → checkout → place order → submit payment reference
+  - Admin: login → confirm payment (waits for "Mark as In production" to appear — proper DB-verified assertion) → advance status → download link present
+- **Bugs fixed during testing:**
+  - `EditorClient`: `useState(initialPhotobook)` never updated when `router.refresh()` changed server props → added `useEffect` to sync state; "Proceed to order" now appears correctly after photobook creation
+  - Test 8 false-positive: assertion on button-text-change during loading (not actual DB state) → fixed to assert on the post-refresh "Mark as In production" button
+- 10 E2E tests passing; 148 unit tests still passing
 
 ### Session 2 — Security & Hardening
 

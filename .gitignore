@@ -42,3 +42,8 @@ next-env.d.ts
 
 # local file uploads
 .uploads/
+.uploads-test/
+
+# Playwright
+/playwright-report/
+/test-results/
