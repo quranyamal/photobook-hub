@@ -1,0 +1,14 @@
+.git
+.gitignore
+.env*
+.uploads/
+.uploads-test/
+node_modules
+.next
+playwright-report
+test-results
+e2e
+*.md
+!docs/
+docs/adr
+docs/development-plan.md
