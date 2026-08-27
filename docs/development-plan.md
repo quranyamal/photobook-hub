@@ -11,32 +11,31 @@ Deliver the minimum viable PhotoBook Hub platform: a customer can register, uplo
 
 ---
 
-## Current State (Sprint 3 Session 1 — Completed)
+## Current State (Sprint 7 — MVP Complete)
 
 | Area | Status |
 |---|---|
 | Next.js application | ✅ Initialized |
 | PostgreSQL + Docker Compose | ✅ Running |
-| Prisma ORM + User schema | ✅ Migrated |
-| Authentication API (register) | ✅ Route handler + Zod validation |
-| Auth.js v5 (credentials provider) | ✅ Configured |
+| Prisma ORM + all schema models | ✅ Migrated |
+| Authentication API + Auth.js v5 | ✅ Configured |
 | Swagger UI at `/api/docs` | ✅ Live |
-| Structured logging (Pino) | ✅ All required fields |
-| OpenTelemetry + Jaeger | ✅ Traces verified |
-| Test suite (80 tests, TDD) | ✅ Passing |
-| Documentation (CLAUDE.md, AGENTS.md, ADRs 0001–0007) | ✅ Current |
-| Register + Login pages (shadcn/ui forms) | ✅ Live |
-| Auth middleware — `/(app)/**` route protection | ✅ Live |
-| Dashboard page (Server Component, session-aware) | ✅ Live |
-| Project + Photo Prisma models + migration | ✅ Applied |
-| `StorageProvider` interface + `LocalStorage` impl | ✅ Done |
-| Photo upload API (6 endpoints + file serving) | ✅ Done |
-| Photo upload UI (projects list + project detail) | ✅ Done |
+| Structured logging (Pino) + OpenTelemetry + Jaeger | ✅ Verified |
+| Register + Login + Dashboard pages | ✅ Live |
+| Auth middleware — app + admin route protection | ✅ Live |
+| Photo upload API + UI | ✅ Done |
 | Photobook editor (schema, API, UI) | ✅ Done |
 | Order placement (schema, API, UI) | ✅ Done |
-| Test suite | ✅ 113 tests passing |
+| Admin panel (auth, API, UI) | ✅ Done |
+| Admin seed script (`pnpm db:seed`) | ✅ Done |
+| Rate limiting (register + signin, in-memory) | ✅ Done |
+| Magic-byte file validation | ✅ Done |
+| E2E test suite (Playwright, 10 tests, isolated DB) | ✅ Passing |
+| Unit + integration tests | ✅ 154 passing |
+| Dockerfile (3-stage) + docker-compose app service | ✅ Builds and runs |
+| Deployment runbook | ✅ Written |
 
-**Not yet implemented:** Admin panel, Sprint 7 polish.
+**MVP status: ready for first customer order.**
 
 ---
 
