@@ -338,28 +338,23 @@ Shipping address as scalar fields on `Order`. Migration: `add-orders`.
 - `GET /api/admin/orders/[id]/assets` — streams ZIP of all page photos named `page-NNN-filename`
 - 30 new tests (148 total passing); `archiver` added as dependency (IN_PRODUCTION → SHIPPED etc.)
 
-### Session 3 — Admin UI
+### Session 3 — Admin UI ✅ Completed
 
-**Admin orders** `src/app/admin/orders/page.tsx`
-- Filterable table: All / Pending Payment / Paid / In Production / Shipped
-- Columns: order number, customer name, photobook details, total, status, date
-
-**Admin order detail** `src/app/admin/orders/[id]/page.tsx`
-- Customer and order info
-- Payment confirmation (confirm / reject with reference code)
-- Status update dropdown
-- "Download print assets" button (ZIP of all page photos)
-- Shipment tracking input (courier + tracking number)
+- `src/app/(app)/admin/orders/page.tsx` — server component; tab bar (All / Pending Payment / Paid / In Production / Shipped / Delivered) via `?status=` searchParam; orders table with customer name, total, status badge, date; links to detail
+- `src/app/(app)/admin/orders/[id]/page.tsx` — server component; Customer & shipping card with full address and pricing breakdown; delegates interactive actions to client component
+- `src/app/(app)/admin/orders/[id]/_components/admin-order-client.tsx` — client component; Confirm / Reject payment buttons (PENDING_PAYMENT only); "Mark as [next status]" button enforcing linear transitions; "Download photos (ZIP)" link to assets endpoint
+- `src/app/(app)/layout.tsx` — Admin nav link added for ADMIN role users
+- Verified in browser: all screens render, payment buttons visible, status filter active tab highlights, unauthenticated redirect to /login works
 
 ### Definition of Done
 
-- [ ] Admin can log in (same login page, role-gated)
-- [ ] Admin can view all orders
-- [ ] Admin can confirm or reject payment
-- [ ] Admin can download print-ready assets
-- [ ] Admin can update order status through to `SHIPPED`
-- [ ] Customer-facing order status updates when admin changes it
-- [ ] `pnpm test`, `pnpm lint`, `pnpm tsc --noEmit` pass
+- [x] Admin can log in (same login page, role-gated)
+- [x] Admin can view all orders
+- [x] Admin can confirm or reject payment
+- [x] Admin can download print-ready assets
+- [x] Admin can update order status through to `SHIPPED`
+- [x] Customer-facing order status updates when admin changes it (router.refresh() on server component)
+- [x] `pnpm test`, `pnpm lint`, `pnpm tsc --noEmit` pass
 
 ---
 

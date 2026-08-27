@@ -1,5 +1,7 @@
 import { auth, signOut } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { UserRole } from "@/generated/prisma/enums";
 
 export default async function AppLayout({
   children,
@@ -18,6 +20,14 @@ export default async function AppLayout({
             </span>
             {session?.user && (
               <div className="flex items-center gap-4">
+                {session.user.role === UserRole.ADMIN && (
+                  <Link
+                    href="/admin/orders"
+                    className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Admin
+                  </Link>
+                )}
                 <span className="text-sm text-muted-foreground">
                   {session.user.name ?? session.user.email}
                 </span>
