@@ -1,8 +1,8 @@
 import path from "node:path";
-import type { Archiver, ZipOptions } from "archiver";
-// archiver uses export=, require is necessary for bundler moduleResolution
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const createArchive = require("archiver") as (format: "zip", options?: ZipOptions) => Archiver;
+import fs from "node:fs/promises";
+import os from "node:os";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 import { requireAdmin } from "@/lib/require-admin";
 import { db } from "@/server/db";
 import {
@@ -13,25 +13,28 @@ import {
 } from "@/lib/request-logger";
 import { env } from "@/config/env";
 
+const execFileAsync = promisify(execFile);
+
 async function buildZip(
   photos: { storageKey: string; fileName: string }[],
   uploadDir: string
 ): Promise<Buffer> {
-  return new Promise((resolve, reject) => {
-    const archive = createArchive("zip", { zlib: { level: 6 } });
-    const chunks: Buffer[] = [];
-    archive.on("data", (chunk: Buffer) => chunks.push(chunk));
-    archive.on("end", () => resolve(Buffer.concat(chunks)));
-    archive.on("error", reject);
-
-    for (const photo of photos) {
-      archive.file(path.join(uploadDir, photo.storageKey), {
-        name: photo.fileName,
-      });
-    }
-
-    archive.finalize();
-  });
+  // Use the system zip command — avoids CJS/ESM interop issues with archiver
+  // under Turbopack. zip is available on macOS and standard Linux servers.
+  const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "pbh-assets-"));
+  try {
+    await Promise.all(
+      photos.map((p) =>
+        fs.copyFile(path.join(uploadDir, p.storageKey), path.join(tmpDir, p.fileName))
+      )
+    );
+    const zipPath = path.join(tmpDir, "assets.zip");
+    const fileArgs = photos.map((p) => path.join(tmpDir, p.fileName));
+    await execFileAsync("zip", ["-j", zipPath, ...fileArgs]);
+    return await fs.readFile(zipPath);
+  } finally {
+    await fs.rm(tmpDir, { recursive: true, force: true });
+  }
 }
 
 export async function GET(
@@ -102,7 +105,7 @@ export async function GET(
     const zipBuffer = await buildZip(orderedPhotos, uploadDir);
 
     logResponse(log, 200, start, { orderId, photoCount: orderedPhotos.length });
-    return new Response(zipBuffer.buffer as ArrayBuffer, {
+    return new Response(new Uint8Array(zipBuffer), {
       headers: {
         "Content-Type": "application/zip",
         "Content-Disposition": `attachment; filename="order-${order.orderNumber}-assets.zip"`,

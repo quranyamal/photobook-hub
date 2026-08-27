@@ -28,18 +28,16 @@ jest.mock("@/server/db", () => ({
   },
 }));
 
-jest.mock("archiver", () => {
-  const EventEmitter = require("node:events");
-  return jest.fn(() => {
-    const archive = new EventEmitter();
-    archive.file = jest.fn();
-    archive.finalize = jest.fn(() => {
-      archive.emit("data", Buffer.from("fake-zip-data"));
-      archive.emit("end");
-    });
-    return archive;
-  });
-});
+jest.mock("node:child_process", () => ({
+  execFile: jest.fn((_cmd, _args, cb) => cb(null, "", "")),
+}));
+
+jest.mock("node:fs/promises", () => ({
+  mkdtemp: jest.fn().mockResolvedValue("/tmp/pbh-test"),
+  copyFile: jest.fn().mockResolvedValue(undefined),
+  readFile: jest.fn().mockResolvedValue(Buffer.from("fake-zip-data")),
+  rm: jest.fn().mockResolvedValue(undefined),
+}));
 
 jest.mock("@/config/env", () => ({
   env: { UPLOAD_DIR: "/tmp/uploads" },
