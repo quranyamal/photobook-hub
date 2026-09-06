@@ -7,16 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatPrice } from "@/config/pricing";
+import { useT } from "@/lib/i18n/context";
 
-const STATUS_STEPS = [
-  { key: "PENDING_PAYMENT", label: "Awaiting payment" },
-  { key: "PAID", label: "Payment confirmed" },
-  { key: "IN_PRODUCTION", label: "In production" },
-  { key: "SHIPPED", label: "Shipped" },
-  { key: "DELIVERED", label: "Delivered" },
-] as const;
-
-type OrderStatus = (typeof STATUS_STEPS)[number]["key"] | "CANCELLED";
+type OrderStatus = "PENDING_PAYMENT" | "PAID" | "IN_PRODUCTION" | "SHIPPED" | "DELIVERED" | "CANCELLED";
 
 type Order = {
   id: string;
@@ -39,6 +32,7 @@ type Order = {
 };
 
 export default function OrderDetailPage() {
+  const t = useT();
   const params = useParams<{ id: string }>();
   const [order, setOrder] = useState<Order | null>(null);
   const [fetching, setFetching] = useState(true);
@@ -46,6 +40,14 @@ export default function OrderDetailPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
+
+  const STATUS_STEPS: { key: OrderStatus; labelKey: keyof typeof t.orderStatus }[] = [
+    { key: "PENDING_PAYMENT", labelKey: "PENDING_PAYMENT" },
+    { key: "PAID", labelKey: "PAYMENT_CONFIRMED" },
+    { key: "IN_PRODUCTION", labelKey: "IN_PRODUCTION" },
+    { key: "SHIPPED", labelKey: "SHIPPED" },
+    { key: "DELIVERED", labelKey: "DELIVERED" },
+  ];
 
   useEffect(() => {
     fetch(`/api/orders/${params.id}`)
@@ -71,7 +73,6 @@ export default function OrderDetailPage() {
         return;
       }
       setSubmitted(true);
-      // Re-fetch order to show updated state
       const updated = await fetch(`/api/orders/${params.id}`).then((r) => r.json());
       setOrder(updated);
     } finally {
@@ -79,25 +80,17 @@ export default function OrderDetailPage() {
     }
   };
 
-  if (fetching) {
-    return <p className="text-sm text-muted-foreground">Loading…</p>;
-  }
-  if (!order) {
-    return <p className="text-sm text-destructive">Order not found.</p>;
-  }
+  if (fetching) return <p className="text-sm text-muted-foreground">{t.orderDetail.loading}</p>;
+  if (!order) return <p className="text-sm text-destructive">{t.orderDetail.notFound}</p>;
 
   const currentStepIndex = STATUS_STEPS.findIndex((s) => s.key === order.status);
-  const alreadySubmitted =
-    submitted || (order.payment?.referenceCode != null);
+  const alreadySubmitted = submitted || order.payment?.referenceCode != null;
 
   return (
     <div className="space-y-8 max-w-2xl">
       <div>
-        <Link
-          href="/orders"
-          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-        >
-          ← Orders
+        <Link href="/orders" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+          {t.orderDetail.backToOrders}
         </Link>
         <h1 className="text-2xl font-bold tracking-tight mt-2">
           Order {order.orderNumber}
@@ -111,11 +104,9 @@ export default function OrderDetailPage() {
           return (
             <div key={step.key} className="flex items-center flex-1 last:flex-none">
               <div className="flex flex-col items-center">
-                <div
-                  className={`w-3 h-3 rounded-full ${done ? "bg-primary" : "bg-muted-foreground/30"}`}
-                />
+                <div className={`w-3 h-3 rounded-full ${done ? "bg-primary" : "bg-muted-foreground/30"}`} />
                 <span className="text-xs text-muted-foreground mt-1 text-center w-16 leading-tight">
-                  {step.label}
+                  {t.orderStatus[step.labelKey]}
                 </span>
               </div>
               {i < STATUS_STEPS.length - 1 && (
@@ -130,44 +121,41 @@ export default function OrderDetailPage() {
       {order.status === "PENDING_PAYMENT" && !alreadySubmitted && (
         <Card>
           <CardHeader>
-            <CardTitle>Bank transfer instructions</CardTitle>
+            <CardTitle>{t.orderDetail.bankTransfer.title}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
             <div className="rounded-lg bg-muted p-4 space-y-2">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Bank</span>
+                <span className="text-muted-foreground">{t.orderDetail.bankTransfer.bank}</span>
                 <span className="font-medium">BCA</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Account number</span>
+                <span className="text-muted-foreground">{t.orderDetail.bankTransfer.accountNumber}</span>
                 <span className="font-mono font-medium">1234-5678-90</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Account name</span>
+                <span className="text-muted-foreground">{t.orderDetail.bankTransfer.accountName}</span>
                 <span className="font-medium">PhotoBook Hub</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Amount</span>
+                <span className="text-muted-foreground">{t.orderDetail.bankTransfer.amount}</span>
                 <span className="font-semibold">{formatPrice(order.totalAmount * 100)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Reference</span>
+                <span className="text-muted-foreground">{t.orderDetail.bankTransfer.reference}</span>
                 <span className="font-mono text-xs">{order.orderNumber}</span>
               </div>
             </div>
-            <p className="text-muted-foreground text-xs">
-              Include your order number as the transfer description. After transferring, enter your bank reference code below.
-            </p>
-
+            <p className="text-muted-foreground text-xs">{t.orderDetail.bankTransfer.instruction}</p>
             <form onSubmit={handlePaymentSubmit} className="flex gap-2">
               <Input
-                placeholder="Transfer reference code"
+                placeholder={t.orderDetail.bankTransfer.placeholder}
                 value={referenceCode}
                 onChange={(e) => setReferenceCode(e.target.value)}
                 className="flex-1"
               />
               <Button type="submit" disabled={submitting || !referenceCode.trim()}>
-                {submitting ? "Sending…" : "I have transferred"}
+                {submitting ? t.orderDetail.bankTransfer.submitting : t.orderDetail.bankTransfer.submit}
               </Button>
             </form>
             {submitError && <p className="text-sm text-destructive">{submitError}</p>}
@@ -180,8 +168,8 @@ export default function OrderDetailPage() {
           <CardContent className="pt-6">
             <p className="text-sm text-muted-foreground">
               {order.status === "PENDING_PAYMENT"
-                ? "Your payment reference has been received. Our team will verify it shortly."
-                : `Order status: ${STATUS_STEPS.find((s) => s.key === order.status)?.label ?? order.status}`}
+                ? t.orderDetail.bankTransfer.received
+                : `${t.orderDetail.orderStatusPrefix} ${t.orderStatus[order.status] ?? order.status}`}
             </p>
           </CardContent>
         </Card>
@@ -189,18 +177,18 @@ export default function OrderDetailPage() {
 
       {/* Order details */}
       <Card>
-        <CardHeader><CardTitle>Details</CardTitle></CardHeader>
+        <CardHeader><CardTitle>{t.orderDetail.details.title}</CardTitle></CardHeader>
         <CardContent className="space-y-2 text-sm">
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Subtotal</span>
+            <span className="text-muted-foreground">{t.orderDetail.details.subtotal}</span>
             <span>{formatPrice(order.subtotal * 100)}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Shipping</span>
+            <span className="text-muted-foreground">{t.orderDetail.details.shipping}</span>
             <span>{formatPrice(order.shippingCost * 100)}</span>
           </div>
           <div className="flex justify-between font-semibold">
-            <span>Total</span>
+            <span>{t.orderDetail.details.total}</span>
             <span>{formatPrice(order.totalAmount * 100)}</span>
           </div>
           <div className="border-t pt-2 mt-2 text-muted-foreground">

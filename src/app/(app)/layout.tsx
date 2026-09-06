@@ -3,13 +3,17 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
 import { UserRole } from "@/generated/prisma/enums";
+import { getLocale } from "@/lib/i18n/server";
+import { getDictionary } from "@/lib/i18n";
+import { LanguageSwitcher } from "@/components/language-switcher";
 
 export default async function AppLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth();
+  const [session, locale] = await Promise.all([auth(), getLocale()]);
+  const t = getDictionary(locale);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -21,12 +25,13 @@ export default async function AppLayout({
             </Link>
             {session?.user && (
               <div className="flex items-center gap-4">
+                <LanguageSwitcher />
                 {session.user.role === UserRole.ADMIN && (
                   <Link
                     href="/admin/orders"
                     className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    Admin
+                    {t.nav.admin}
                   </Link>
                 )}
                 <span className="text-sm text-muted-foreground">
@@ -39,7 +44,7 @@ export default async function AppLayout({
                   }}
                 >
                   <Button type="submit" variant="outline" size="sm">
-                    Log out
+                    {t.nav.signOut}
                   </Button>
                 </form>
               </div>

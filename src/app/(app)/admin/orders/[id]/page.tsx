@@ -6,15 +6,8 @@ import { UserRole } from "@/generated/prisma/enums";
 import { formatPrice } from "@/config/pricing";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AdminOrderClient } from "./_components/admin-order-client";
-
-const STATUS_LABEL: Record<string, string> = {
-  PENDING_PAYMENT: "Pending payment",
-  PAID: "Paid",
-  IN_PRODUCTION: "In production",
-  SHIPPED: "Shipped",
-  DELIVERED: "Delivered",
-  CANCELLED: "Cancelled",
-};
+import { getLocale } from "@/lib/i18n/server";
+import { getDictionary } from "@/lib/i18n";
 
 const STATUS_CLASS: Record<string, string> = {
   PENDING_PAYMENT: "bg-yellow-100 text-yellow-800",
@@ -30,10 +23,11 @@ export default async function AdminOrderDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const session = await auth();
+  const [session, locale] = await Promise.all([auth(), getLocale()]);
   if (!session) redirect("/login");
   if (session.user.role !== UserRole.ADMIN) redirect("/dashboard");
 
+  const t = getDictionary(locale);
   const { id } = await params;
 
   const order = await db.order.findUnique({
@@ -53,17 +47,13 @@ export default async function AdminOrderDetailPage({
       postalCode: true,
       createdAt: true,
       user: { select: { name: true, email: true } },
-      payment: {
-        select: {
-          status: true,
-          referenceCode: true,
-          paidAt: true,
-        },
-      },
+      payment: { select: { status: true, referenceCode: true, paidAt: true } },
     },
   });
 
   if (!order) notFound();
+
+  const dateLocale = locale === "ar" ? "ar-SA" : locale === "id" ? "id-ID" : "en-US";
 
   const payment = order.payment
     ? {
@@ -76,40 +66,28 @@ export default async function AdminOrderDetailPage({
   return (
     <div className="space-y-8 max-w-2xl">
       <div>
-        <Link
-          href="/admin/orders"
-          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-        >
-          ← Orders
+        <Link href="/admin/orders" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+          {t.adminOrders.backToOrders}
         </Link>
         <div className="flex items-center gap-3 mt-2">
-          <h1 className="text-2xl font-bold tracking-tight font-mono">
-            {order.orderNumber}
-          </h1>
-          <span
-            className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_CLASS[order.status] ?? "bg-muted text-muted-foreground"}`}
-          >
-            {STATUS_LABEL[order.status] ?? order.status}
+          <h1 className="text-2xl font-bold tracking-tight font-mono">{order.orderNumber}</h1>
+          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_CLASS[order.status] ?? "bg-muted text-muted-foreground"}`}>
+            {t.orderStatus[order.status as keyof typeof t.orderStatus] ?? order.status}
           </span>
         </div>
         <p className="text-sm text-muted-foreground mt-1">
-          Placed{" "}
-          {order.createdAt.toLocaleDateString("en-US", {
-            month: "long",
-            day: "numeric",
-            year: "numeric",
-          })}
+          {t.adminOrders.placed}{" "}
+          {order.createdAt.toLocaleDateString(dateLocale, { month: "long", day: "numeric", year: "numeric" })}
         </p>
       </div>
 
-      {/* Customer & shipping */}
       <Card>
         <CardHeader>
-          <CardTitle>Customer &amp; shipping</CardTitle>
+          <CardTitle>{t.adminOrders.customerShipping.title}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2 text-sm">
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Customer</span>
+            <span className="text-muted-foreground">{t.adminOrders.customerShipping.customer}</span>
             <span className="text-right">
               {order.user.name ?? "—"}
               <br />
@@ -117,15 +95,15 @@ export default async function AdminOrderDetailPage({
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Recipient</span>
+            <span className="text-muted-foreground">{t.adminOrders.customerShipping.recipient}</span>
             <span>{order.recipientName}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Phone</span>
+            <span className="text-muted-foreground">{t.adminOrders.customerShipping.phone}</span>
             <span>{order.phoneNumber}</span>
           </div>
           <div className="flex justify-between gap-4">
-            <span className="text-muted-foreground shrink-0">Address</span>
+            <span className="text-muted-foreground shrink-0">{t.adminOrders.customerShipping.address}</span>
             <span className="text-right">
               {order.addressLine}
               <br />
@@ -134,27 +112,22 @@ export default async function AdminOrderDetailPage({
           </div>
           <div className="border-t pt-3 mt-1 space-y-1">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Subtotal</span>
+              <span className="text-muted-foreground">{t.adminOrders.customerShipping.subtotal}</span>
               <span>{formatPrice(Number(order.subtotal) * 100)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Shipping</span>
+              <span className="text-muted-foreground">{t.adminOrders.customerShipping.shipping}</span>
               <span>{formatPrice(Number(order.shippingCost) * 100)}</span>
             </div>
             <div className="flex justify-between font-semibold">
-              <span>Total</span>
+              <span>{t.adminOrders.customerShipping.total}</span>
               <span>{formatPrice(Number(order.totalAmount) * 100)}</span>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Interactive actions — client component */}
-      <AdminOrderClient
-        orderId={id}
-        orderStatus={order.status}
-        payment={payment}
-      />
+      <AdminOrderClient orderId={id} orderStatus={order.status} payment={payment} />
     </div>
   );
 }

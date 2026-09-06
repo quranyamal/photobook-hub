@@ -25,6 +25,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useT } from "@/lib/i18n/context";
 
 const registerSchema = z.object({
   name: z.string().min(1, "Name is required").max(100),
@@ -35,6 +36,7 @@ const registerSchema = z.object({
 type RegisterValues = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
+  const t = useT();
   const router = useRouter();
   const [serverError, setServerError] = useState<string | null>(null);
 
@@ -73,16 +75,14 @@ export default function RegisterPage() {
       return;
     }
 
-    setServerError("Something went wrong. Please try again.");
+    setServerError(t.auth.register.somethingWrong);
   }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-2xl">Create an account</CardTitle>
-        <CardDescription>
-          Start creating your personalized photobooks
-        </CardDescription>
+        <CardTitle className="text-2xl">{t.auth.register.title}</CardTitle>
+        <CardDescription>{t.auth.register.description}</CardDescription>
       </CardHeader>
 
       <CardContent>
@@ -93,7 +93,7 @@ export default function RegisterPage() {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>{t.auth.register.name}</FormLabel>
                   <FormControl>
                     <Input placeholder="Jane Doe" {...field} />
                   </FormControl>
@@ -107,7 +107,7 @@ export default function RegisterPage() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>{t.auth.register.email}</FormLabel>
                   <FormControl>
                     <Input
                       type="email"
@@ -126,11 +126,11 @@ export default function RegisterPage() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>{t.auth.register.password}</FormLabel>
                   <FormControl>
                     <Input
                       type="password"
-                      placeholder="Min. 8 characters"
+                      placeholder="Min. 8 karakter"
                       autoComplete="new-password"
                       {...field}
                     />
@@ -149,9 +149,7 @@ export default function RegisterPage() {
               className="w-full"
               disabled={form.formState.isSubmitting}
             >
-              {form.formState.isSubmitting
-                ? "Creating account…"
-                : "Create account"}
+              {form.formState.isSubmitting ? t.auth.register.submitting : t.auth.register.submit}
             </Button>
           </form>
         </Form>
@@ -159,12 +157,12 @@ export default function RegisterPage() {
 
       <CardFooter className="justify-center">
         <p className="text-sm text-muted-foreground">
-          Already have an account?{" "}
+          {t.auth.register.hasAccount}{" "}
           <Link
             href="/login"
             className="text-foreground underline underline-offset-4"
           >
-            Log in
+            {t.auth.register.logIn}
           </Link>
         </p>
       </CardFooter>

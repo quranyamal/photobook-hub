@@ -26,6 +26,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useT } from "@/lib/i18n/context";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -35,6 +36,7 @@ const loginSchema = z.object({
 type LoginValues = z.infer<typeof loginSchema>;
 
 function LoginForm() {
+  const t = useT();
   const router = useRouter();
   const searchParams = useSearchParams();
   const justRegistered = searchParams.get("registered") === "true";
@@ -55,7 +57,7 @@ function LoginForm() {
     });
 
     if (result?.error) {
-      setError("Invalid email or password");
+      setError(t.auth.login.invalidCredentials);
       return;
     }
 
@@ -66,14 +68,14 @@ function LoginForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-2xl">Log in</CardTitle>
-        <CardDescription>Welcome back to PhotoBook Hub</CardDescription>
+        <CardTitle className="text-2xl">{t.auth.login.title}</CardTitle>
+        <CardDescription>{t.auth.login.description}</CardDescription>
       </CardHeader>
 
       <CardContent className="space-y-4">
         {justRegistered && (
           <div className="rounded-md bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-800">
-            Account created! You can now log in.
+            {t.auth.login.accountCreated}
           </div>
         )}
 
@@ -84,7 +86,7 @@ function LoginForm() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>{t.auth.login.email}</FormLabel>
                   <FormControl>
                     <Input
                       type="email"
@@ -103,11 +105,11 @@ function LoginForm() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>{t.auth.login.password}</FormLabel>
                   <FormControl>
                     <Input
                       type="password"
-                      placeholder="Your password"
+                      placeholder="••••••••"
                       autoComplete="current-password"
                       {...field}
                     />
@@ -126,7 +128,7 @@ function LoginForm() {
               className="w-full"
               disabled={form.formState.isSubmitting}
             >
-              {form.formState.isSubmitting ? "Logging in…" : "Log in"}
+              {form.formState.isSubmitting ? t.auth.login.submitting : t.auth.login.submit}
             </Button>
           </form>
         </Form>
@@ -134,12 +136,12 @@ function LoginForm() {
 
       <CardFooter className="justify-center">
         <p className="text-sm text-muted-foreground">
-          Don&apos;t have an account?{" "}
+          {t.auth.login.noAccount}{" "}
           <Link
             href="/register"
             className="text-foreground underline underline-offset-4"
           >
-            Sign up
+            {t.auth.login.signUp}
           </Link>
         </p>
       </CardFooter>

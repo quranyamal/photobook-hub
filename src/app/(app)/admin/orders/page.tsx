@@ -4,24 +4,8 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { UserRole } from "@/generated/prisma/enums";
 import { formatPrice } from "@/config/pricing";
-
-const TABS = [
-  { label: "All", value: "" },
-  { label: "Pending payment", value: "PENDING_PAYMENT" },
-  { label: "Paid", value: "PAID" },
-  { label: "In production", value: "IN_PRODUCTION" },
-  { label: "Shipped", value: "SHIPPED" },
-  { label: "Delivered", value: "DELIVERED" },
-];
-
-const STATUS_LABEL: Record<string, string> = {
-  PENDING_PAYMENT: "Pending payment",
-  PAID: "Paid",
-  IN_PRODUCTION: "In production",
-  SHIPPED: "Shipped",
-  DELIVERED: "Delivered",
-  CANCELLED: "Cancelled",
-};
+import { getLocale } from "@/lib/i18n/server";
+import { getDictionary } from "@/lib/i18n";
 
 const STATUS_CLASS: Record<string, string> = {
   PENDING_PAYMENT: "bg-yellow-100 text-yellow-800",
@@ -39,9 +23,11 @@ export default async function AdminOrdersPage({
 }: {
   searchParams: Promise<{ status?: string }>;
 }) {
-  const session = await auth();
+  const [session, locale] = await Promise.all([auth(), getLocale()]);
   if (!session) redirect("/login");
   if (session.user.role !== UserRole.ADMIN) redirect("/dashboard");
+
+  const t = getDictionary(locale);
 
   const { status } = await searchParams;
   const statusFilter = status && VALID_STATUSES.has(status) ? status : null;
@@ -60,12 +46,23 @@ export default async function AdminOrdersPage({
     orderBy: { createdAt: "desc" },
   });
 
+  const dateLocale = locale === "ar" ? "ar-SA" : locale === "id" ? "id-ID" : "en-US";
+
+  const TABS = [
+    { label: t.adminOrders.filterAll, value: "" },
+    { label: t.orderStatus.PENDING_PAYMENT, value: "PENDING_PAYMENT" },
+    { label: t.orderStatus.PAID, value: "PAID" },
+    { label: t.orderStatus.IN_PRODUCTION, value: "IN_PRODUCTION" },
+    { label: t.orderStatus.SHIPPED, value: "SHIPPED" },
+    { label: t.orderStatus.DELIVERED, value: "DELIVERED" },
+  ];
+
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Orders</h1>
+        <h1 className="text-2xl font-bold tracking-tight">{t.adminOrders.title}</h1>
         <p className="text-sm text-muted-foreground mt-1">
-          All customer orders · {orders.length} result{orders.length !== 1 ? "s" : ""}
+          {orders.length} {orders.length === 1 ? "result" : "results"}
         </p>
       </div>
 
@@ -91,28 +88,25 @@ export default async function AdminOrdersPage({
 
       {orders.length === 0 ? (
         <div className="flex items-center justify-center rounded-xl border border-dashed p-16 text-center">
-          <p className="text-sm text-muted-foreground">No orders match this filter.</p>
+          <p className="text-sm text-muted-foreground">{t.adminOrders.noMatch}</p>
         </div>
       ) : (
         <div className="rounded-xl border overflow-hidden">
           <table className="w-full text-sm">
             <thead className="bg-muted/50">
               <tr>
-                <th className="text-left px-4 py-3 font-medium text-muted-foreground">Order</th>
-                <th className="text-left px-4 py-3 font-medium text-muted-foreground">Customer</th>
-                <th className="text-left px-4 py-3 font-medium text-muted-foreground">Total</th>
-                <th className="text-left px-4 py-3 font-medium text-muted-foreground">Status</th>
-                <th className="text-left px-4 py-3 font-medium text-muted-foreground">Date</th>
+                <th className="text-left px-4 py-3 font-medium text-muted-foreground">{t.adminOrders.columns.order}</th>
+                <th className="text-left px-4 py-3 font-medium text-muted-foreground">{t.adminOrders.columns.customer}</th>
+                <th className="text-left px-4 py-3 font-medium text-muted-foreground">{t.adminOrders.columns.total}</th>
+                <th className="text-left px-4 py-3 font-medium text-muted-foreground">{t.adminOrders.columns.status}</th>
+                <th className="text-left px-4 py-3 font-medium text-muted-foreground">{t.adminOrders.columns.date}</th>
               </tr>
             </thead>
             <tbody className="divide-y">
               {orders.map((order) => (
                 <tr key={order.id} className="hover:bg-muted/30 transition-colors">
                   <td className="px-4 py-3">
-                    <Link
-                      href={`/admin/orders/${order.id}`}
-                      className="font-mono text-xs font-medium underline underline-offset-2"
-                    >
+                    <Link href={`/admin/orders/${order.id}`} className="font-mono text-xs font-medium underline underline-offset-2">
                       {order.orderNumber}
                     </Link>
                   </td>
@@ -123,18 +117,12 @@ export default async function AdminOrdersPage({
                   </td>
                   <td className="px-4 py-3">{formatPrice(Number(order.totalAmount) * 100)}</td>
                   <td className="px-4 py-3">
-                    <span
-                      className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_CLASS[order.status] ?? "bg-muted text-muted-foreground"}`}
-                    >
-                      {STATUS_LABEL[order.status] ?? order.status}
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_CLASS[order.status] ?? "bg-muted text-muted-foreground"}`}>
+                      {t.orderStatus[order.status as keyof typeof t.orderStatus] ?? order.status}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">
-                    {order.createdAt.toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
+                    {order.createdAt.toLocaleDateString(dateLocale, { month: "short", day: "numeric", year: "numeric" })}
                   </td>
                 </tr>
               ))}
