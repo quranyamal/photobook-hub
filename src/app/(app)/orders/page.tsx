@@ -41,6 +41,9 @@ export default async function OrdersPage() {
 
   return (
     <div className="space-y-6">
+      <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+        ← Dashboard
+      </Link>
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Orders</h1>
         <p className="text-sm text-muted-foreground mt-1">

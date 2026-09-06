@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/server/db";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { UserRole } from "@/generated/prisma/enums";
 import {
   Card,
   CardDescription,
@@ -12,6 +13,7 @@ import {
 export default async function DashboardPage() {
   const session = await auth();
   if (!session) redirect("/login");
+  if (session.user.role === UserRole.ADMIN) redirect("/admin/orders");
 
   const user = await db.user.findUniqueOrThrow({
     where: { id: session.user.id },

@@ -19,17 +19,17 @@ export const SIZE_CONFIG: Record<PhotobookSize, SizeConfig> = {
 
 export const COVER_CONFIG: Record<CoverType, CoverConfig> = {
   SOFTCOVER: { label: "Softcover", priceAddition: 0 },
-  HARDCOVER: { label: "Hardcover", priceAddition: 3000 }, // +$30.00
+  HARDCOVER: { label: "Hardcover", priceAddition: 5000000 }, // +Rp 50,000
 };
 
-// Base price per size in cents (USD)
+// Base price per size in IDR × 100 (stored as IDR / 100 in DB)
 export const BASE_PRICE_CENTS: Record<PhotobookSize, number> = {
-  A4: 2999, // $29.99
-  A5: 2499, // $24.99
-  SQUARE: 2499, // $24.99
+  A4: 15000000,    // Rp 150,000
+  A5: 12000000,    // Rp 120,000
+  SQUARE: 12000000, // Rp 120,000
 };
 
-export const SHIPPING_COST_CENTS = 999; // $9.99 flat rate
+export const SHIPPING_COST_CENTS = 2500000; // Rp 25,000 flat rate
 
 export function getSubtotalCents(
   size: PhotobookSize,
@@ -46,5 +46,7 @@ export function getTotalPriceCents(
 }
 
 export function formatPrice(cents: number): string {
-  return `$${(cents / 100).toFixed(2)}`;
+  const amount = Math.round(cents / 100);
+  const formatted = amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return `Rp ${formatted}`;
 }

@@ -1,6 +1,7 @@
 import { auth, signOut } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import Image from "next/image";
 import { UserRole } from "@/generated/prisma/enums";
 
 export default async function AppLayout({
@@ -15,9 +16,9 @@ export default async function AppLayout({
       <header className="border-b bg-background">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
-            <span className="text-lg font-semibold tracking-tight">
-              PhotoBook Hub
-            </span>
+            <Link href="/">
+              <Image src="/logo.svg" width={165} height={33} alt="PhotoBook Hub" unoptimized priority />
+            </Link>
             {session?.user && (
               <div className="flex items-center gap-4">
                 {session.user.role === UserRole.ADMIN && (

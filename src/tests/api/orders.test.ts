@@ -63,9 +63,9 @@ const createdOrder = {
   id: "order_01",
   orderNumber: "PBH-ABC-XY12",
   status: "PENDING_PAYMENT",
-  subtotal: 29.99,
-  shippingCost: 9.99,
-  totalAmount: 39.98,
+  subtotal: 150000,
+  shippingCost: 25000,
+  totalAmount: 175000,
   createdAt: new Date("2026-01-01"),
 };
 
@@ -97,9 +97,9 @@ describe("POST /api/orders", () => {
     expect(mockOrderCreate).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({
-          subtotal: 29.99,
-          shippingCost: 9.99,
-          totalAmount: 39.98,
+          subtotal: 150000,
+          shippingCost: 25000,
+          totalAmount: 175000,
         }),
       })
     );
@@ -167,8 +167,8 @@ describe("GET /api/orders/[id]", () => {
     city: "Jakarta",
     province: "DKI Jakarta",
     postalCode: "10110",
-    items: [{ id: "item_01", photobookId: "pb_01", quantity: 1, unitPrice: 29.99 }],
-    payment: { id: "pay_01", status: "AWAITING", method: "BANK_TRANSFER", amount: 39.98, referenceCode: null, paidAt: null },
+    items: [{ id: "item_01", photobookId: "pb_01", quantity: 1, unitPrice: 150000 }],
+    payment: { id: "pay_01", status: "AWAITING", method: "BANK_TRANSFER", amount: 175000, referenceCode: null, paidAt: null },
   };
 
   beforeEach(() => mockOrderFindFirst.mockResolvedValue(fullOrder));

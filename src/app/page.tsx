@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
+import { UserRole } from "@/generated/prisma/enums";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -27,8 +27,7 @@ export const metadata: Metadata = {
 
 export default async function Home() {
   const session = await auth();
-  if (session) redirect("/dashboard");
-  return <MarketingPage />;
+  return <MarketingPage isLoggedIn={!!session} isAdmin={session?.user.role === UserRole.ADMIN} />;
 }
 
 const steps = [
@@ -82,7 +81,7 @@ const features = [
   },
 ];
 
-function MarketingPage() {
+function MarketingPage({ isLoggedIn, isAdmin }: { isLoggedIn: boolean; isAdmin: boolean }) {
   return (
     <div className="min-h-screen flex flex-col">
 
@@ -93,56 +92,79 @@ function MarketingPage() {
             <Image src="/logo.svg" width={165} height={33} alt="PhotoBook Hub" unoptimized priority />
           </Link>
           <nav className="flex items-center gap-3">
-            <Link href="/login">
-              <Button variant="outline" size="sm">Log in</Button>
-            </Link>
-            <Link href="/register">
-              <Button size="sm">Get started</Button>
-            </Link>
+            {isLoggedIn ? (
+              <Link href="/dashboard">
+                <Button size="sm">Dashboard</Button>
+              </Link>
+            ) : (
+              <>
+                <Link href="/login">
+                  <Button variant="outline" size="sm">Log in</Button>
+                </Link>
+                <Link href="/register">
+                  <Button size="sm">Get started</Button>
+                </Link>
+              </>
+            )}
           </nav>
         </div>
       </header>
 
       <main className="flex-1">
 
-        {/* Hero */}
-        <section className="py-24 sm:py-32 text-center px-4">
-          <div className="max-w-3xl mx-auto space-y-6">
-            <span className="inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-              Memories, beautifully bound
-            </span>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight">
-              Turn your photos into a photobook you&apos;ll treasure forever
-            </h1>
-            <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-              Upload your photos, design your book, and receive a professionally printed keepsake — delivered straight to your door.
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
-              <Link href="/register">
-                <Button size="lg">Create your first book</Button>
-              </Link>
-              <Link href="/login">
-                <Button variant="ghost" size="lg">Sign in</Button>
-              </Link>
-            </div>
-            <p className="text-sm text-muted-foreground pt-2">
-              Join thousands of families preserving their memories
-            </p>
-          </div>
-        </section>
+        {/* Hero + Video */}
+        <section className="pt-4 pb-8 px-4">
+          <div
+            className="max-w-7xl mx-auto"
+            style={{ display: "flex", flexWrap: "wrap", gap: "3rem", alignItems: "center" }}
+          >
 
-        {/* Video */}
-        <section className="py-16 px-4">
-          <div className="max-w-4xl mx-auto">
-            <div className="aspect-video rounded-2xl overflow-hidden border border-border shadow-sm">
-              <iframe
-                src="https://www.youtube.com/embed/xc7rjcH8epc"
-                title="PhotoBook Hub — see how it works"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-                className="w-full h-full"
-              />
+            {/* Text */}
+            <div style={{ flex: "3 1 0", minWidth: "280px" }} className="space-y-6">
+              <span className="inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                Memories, beautifully bound
+              </span>
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight">
+                Turn your photos into a photobook you&apos;ll treasure forever
+              </h1>
+              <p className="text-lg sm:text-xl text-muted-foreground">
+                Upload your photos, design your book, and receive a professionally printed keepsake — delivered straight to your door.
+              </p>
+              {!isLoggedIn && (
+                <div className="flex flex-wrap gap-4">
+                  <Link href="/register">
+                    <Button size="lg">Create your first book</Button>
+                  </Link>
+                  <Link href="/login">
+                    <Button variant="ghost" size="lg">Sign in</Button>
+                  </Link>
+                </div>
+              )}
+              <p className="text-sm text-muted-foreground">
+                Join thousands of families preserving their memories
+              </p>
             </div>
+
+            {/* Portrait video — height-driven so it always fits the viewport */}
+            <div style={{ flex: "2 1 0", minWidth: "200px", display: "flex", justifyContent: "center" }}>
+              <div
+                className="relative rounded-2xl overflow-hidden border border-border shadow-sm"
+                style={{
+                  height: "calc(100vh - 64px - 3rem)",
+                  width: "calc((100vh - 64px - 3rem) * 9 / 16)",
+                  maxWidth: "100%",
+                }}
+              >
+                <iframe
+                  src="https://www.youtube.com/embed/BnVDW8STZoA?autoplay=1&mute=1&loop=1&playlist=BnVDW8STZoA"
+                  title="PhotoBook Hub — see how it works"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="absolute inset-0 w-full h-full"
+                />
+              </div>
+            </div>
+
           </div>
         </section>
 
@@ -193,16 +215,18 @@ function MarketingPage() {
             <p className="text-primary-foreground/80">
               It only takes a few minutes to upload your photos and place an order.
             </p>
-            <div className="pt-2">
-              <Link href="/register">
-                <Button
-                  size="lg"
-                  className="bg-primary-foreground text-primary hover:bg-primary-foreground/90"
-                >
-                  Get started free
-                </Button>
-              </Link>
-            </div>
+            {!isLoggedIn && (
+              <div className="pt-2">
+                <Link href="/register">
+                  <Button
+                    size="lg"
+                    className="bg-primary-foreground text-primary hover:bg-primary-foreground/90"
+                  >
+                    Get started free
+                  </Button>
+                </Link>
+              </div>
+            )}
           </div>
         </section>
 
@@ -216,8 +240,12 @@ function MarketingPage() {
             <span>© {new Date().getFullYear()} PhotoBook Hub</span>
           </div>
           <nav className="flex gap-4">
-            <Link href="/brand" className="hover:text-foreground transition-colors">Style guide</Link>
-            <Link href="/login" className="hover:text-foreground transition-colors">Sign in</Link>
+            {isAdmin && (
+              <Link href="/brand" className="hover:text-foreground transition-colors">Style guide</Link>
+            )}
+            {!isLoggedIn && (
+              <Link href="/login" className="hover:text-foreground transition-colors">Sign in</Link>
+            )}
           </nav>
         </div>
       </footer>

@@ -41,6 +41,9 @@ export default async function ProjectsPage() {
 
   return (
     <div className="space-y-6">
+      <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+        ← Dashboard
+      </Link>
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Projects</h1>
