@@ -1,4 +1,9 @@
-// Loads .env before starting the Next.js standalone server.
-// Required for Plesk hosting where env vars are not injected into the process.
-require("dotenv").config();
+const path = require("path");
+require("dotenv").config({ path: path.join(__dirname, ".env") });
+
+if (!process.env.DATABASE_URL) {
+  console.error("ERROR: DATABASE_URL is not set. Check your .env file at", __dirname);
+  process.exit(1);
+}
+
 require("./.next/standalone/server");
